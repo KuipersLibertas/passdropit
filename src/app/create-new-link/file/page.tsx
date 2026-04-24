@@ -1,0 +1,26 @@
+import React from 'react';
+import MainLayout from '@/layouts/Main';
+import Script from 'next/script';
+
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/lib/auth';
+import { redirect } from 'next/navigation';
+
+import { default as ChooseFileView } from '@/views/create-new-link/ChooseFile';
+
+const ChooseFile = async () => {
+  const session = await getServerSession(authOptions);
+  if (session === null) {
+    redirect('/signin');
+  }
+
+  return (
+    <MainLayout>
+      <Script src="https://www.dropbox.com/static/api/1/dropins.js" id="dropboxjs" data-app-key="pg833ddyw39cs0m" />
+      <Script src="https://apis.google.com/js/api.js" />
+      <ChooseFileView />
+    </MainLayout>
+  );
+};
+
+export default ChooseFile;

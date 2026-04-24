@@ -1,0 +1,12 @@
+# www.passdropit.com llms.txt
+
+> Enhance Dropbox sharing by providing additional security, customization, analytics, and management features for links, primarily through passes, expiring links, branding, and notifications.
+
+- [Sign Up](https://www.passdropit.com/signup): Register new users for Passdropit platform.
+- [Dropbox Link Enhancer](https://www.passdropit.com): Promote Dropbox link management with enhanced security, analytics, and customization features through Passdropit.
+- [Secure Link Sharing](https://www.passdropit.com/script): Promote tools for securely sharing and protecting digital links and files.
+- [Service Terms](https://www.passdropit.com/terms-of-service): Outlines terms and conditions for using Passdropit's website and services.
+- [Link Error Notification](https://www.passdropit.com/company-terms): Inform users about expired or invalid link issues on PassDropIt.
+- [About Passdropit](https://www.passdropit.com/about-us): Introduce Passdropit's history, mission, and team for secure link sharing solutions.
+- [Passdropit Login](https://www.passdropit.com/signin): User login portal for Passdropit service
+- [Privacy Policy](https://www.passdropit.com/privacy-policy): Outlines Passdropit's data collection, usage, and privacy practices for user information protection.
