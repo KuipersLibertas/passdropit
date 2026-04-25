@@ -122,13 +122,13 @@ const Topbar = ({
           <Box sx={{ display: { xs: 'none', md: 'flex' } }} alignItems="center">
             {!authenticated&&
               <Box display="flex" columnGap={1}>
-                <IconButton href="https://www.twitter.com/passdropit">
+                <IconButton href="https://www.twitter.com/passdropit" target="_blank" rel="noopener noreferrer">
                   <TwitterIcon color={theme.palette.text.primary} />
                 </IconButton>
-                <IconButton href="https://www.facebook.com/passdropit">
+                <IconButton href="https://www.facebook.com/passdropit" target="_blank" rel="noopener noreferrer">
                   <FacebookIcon width={20} height={20} color={theme.palette.text.primary} />
                 </IconButton>
-                <IconButton href="https://www.instagram.com/passdropit" sx={{ color: 'text.primary' }}>
+                <IconButton href="https://www.instagram.com/passdropit" target="_blank" rel="noopener noreferrer" sx={{ color: 'text.primary' }}>
                   <Instagram />
                 </IconButton>
               </Box>

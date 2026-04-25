@@ -17,10 +17,10 @@ const footerLinks = {
     { title: 'Terms of Service', href: '/terms-of-service' },
   ],
   connect: [
-    { title: 'Twitter / X', href: 'https://www.twitter.com/passdropit' },
-    { title: 'Facebook', href: 'https://www.facebook.com/passdropit' },
-    { title: 'Instagram', href: 'https://www.instagram.com/passdropit' },
-    { title: 'Contact Us', href: 'mailto:contact@passdropit.com' },
+    { title: 'Twitter / X', href: 'https://www.twitter.com/passdropit', external: true },
+    { title: 'Facebook', href: 'https://www.facebook.com/passdropit', external: true },
+    { title: 'Instagram', href: 'https://www.instagram.com/passdropit', external: true },
+    { title: 'Contact Us', href: 'mailto:contact@passdropit.com', external: false },
   ],
 };
 
@@ -29,7 +29,7 @@ const FooterLinkGroup = ({
   links,
 }: {
   title: string;
-  links: { title: string; href: string }[];
+  links: { title: string; href: string; external?: boolean }[];
 }): JSX.Element => (
   <Box>
     <Typography
@@ -49,6 +49,7 @@ const FooterLinkGroup = ({
           key={link.href}
           href={link.href}
           underline="none"
+          {...(link.external && { target: '_blank', rel: 'noopener noreferrer' })}
           sx={{
             fontSize: '0.875rem',
             color: '#475569',
