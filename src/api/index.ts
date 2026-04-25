@@ -42,13 +42,12 @@ export const getSession = async () => {
 };
 
 export const signUp = async (params: RequestParams.SignUp): Promise<any> => {
-  return createRequest(
-    {
-      endpoint: '/auth/register',
-      method: 'POST',
-      body: params,
-    }    
-  );
+  const res = await fetch('/api/auth/register', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(params),
+  });
+  return res.json();
 };
 
 export const checkGoogleLink = async (url: string): Promise<any> => {
