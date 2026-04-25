@@ -10,7 +10,7 @@ import { alpha, useTheme } from '@mui/material/styles';
 import { LockOutlined } from '@mui/icons-material';
 import { IServerLinkDetail } from '@/types';
 import { Images } from '@/utils/assets';
-import { ThemeMode } from '@/utils/constants';
+import { ThemeMode, UserLevel } from '@/utils/constants';
 
 const Download = ({ linkInfo }: { linkInfo: IServerLinkDetail }): JSX.Element => {
   const theme = useTheme();
@@ -56,7 +56,7 @@ const Download = ({ linkInfo }: { linkInfo: IServerLinkDetail }): JSX.Element =>
         }}
       >
         <Link href="/" sx={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
-          {linkInfo.ownerLogo ? (
+          {linkInfo.ownerLogo && linkInfo.ownerLevel >= UserLevel.Pro ? (
             <Box
               component="img"
               src={linkInfo.ownerLogo}

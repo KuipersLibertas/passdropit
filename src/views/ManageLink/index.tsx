@@ -28,13 +28,16 @@ import { DropboxIcon, OpenFolderIcon } from '@/utils/icons';
 import { Images } from '@/utils/assets';
 import { IServerLink, IPopupOptions, IFile } from '@/types';
 import { toast } from 'react-toastify';
-import { CustomToastOptions, LinkType, ServiceType, ThemeMode } from '@/utils/constants';
+import { CustomToastOptions, LinkType, ServiceType, ThemeMode, UserLevel } from '@/utils/constants';
+import { useSession } from 'next-auth/react';
 
 type ManageLinkProps = {
   data: IServerLink[],
 }
 const ManageLink = ({ data }: ManageLinkProps): JSX.Element => {
   const theme = useTheme();
+  const { data: session } = useSession();
+  const isPro = (session?.user?.level ?? 0) >= UserLevel.Pro;
   const [confirmPopupOptions, setConfirmPopupOptions] = useState<IPopupOptions>({ id: 0, opened: false });
   const [editLinkPopupOptions, setEditLinkPopupOptions] = useState<IPopupOptions>({ linkInfo: null, opened: false });
   const [analyticsPopupOptions, setAnalyticsPopupOptions] = useState<IPopupOptions>({ linkInfo: null, opened: false });
@@ -205,13 +208,15 @@ const ManageLink = ({ data }: ManageLinkProps): JSX.Element => {
             >
               <EditIcon />
             </IconButton>
-            <IconButton
-              onClick={() => {
-                setAnalyticsPopupOptions({ linkInfo: link, opened: true });
-              }}
-            >
-              <AnalyticsIcon />
-            </IconButton>
+            {isPro && (
+              <IconButton
+                onClick={() => {
+                  setAnalyticsPopupOptions({ linkInfo: link, opened: true });
+                }}
+              >
+                <AnalyticsIcon />
+              </IconButton>
+            )}
             <IconButton
               href={`mailto:?subject=Here is a Passdrop link&body=%0A%0AHere is a link to download your file: ${process.env.NEXT_PUBLIC_PASSDROPIT_SITE_URL}/${link.link} %0A%0A And here is the password: ${link.password} %0A%0A---%0ASent via Passdrop (${process.env.NEXT_PUBLIC_PASSDROPIT_SITE_URL}), password protection for your Dropbox files.`}
               title="Share"
