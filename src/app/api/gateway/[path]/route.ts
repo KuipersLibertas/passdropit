@@ -5,6 +5,7 @@ import { rateLimit } from '@/lib/rateLimit';
 
 import * as authDb from '@/lib/db/auth';
 import * as linksDb from '@/lib/db/links';
+import { isValidLinkUrl } from '@/lib/db/links';
 import * as userDb from '@/lib/db/user';
 import * as adminDb from '@/lib/db/admin';
 
@@ -14,7 +15,9 @@ function isAdmin(session: any): boolean {
 
 function sanitiseIP(raw: string | null): string {
   if (!raw) return '';
-  const candidate = raw.split(',')[0].trim();
+  // Take the rightmost IP — client-supplied leftmost entries can be spoofed;
+  // the rightmost is appended by the trusted reverse proxy (Vercel).
+  const candidate = raw.split(',').map(s => s.trim()).filter(Boolean).at(-1) ?? '';
   const ipv4 = /^(\d{1,3}\.){3}\d{1,3}$/;
   const ipv6 = /^[0-9a-fA-F:]{3,39}$/;
   return (ipv4.test(candidate) || ipv6.test(candidate)) ? candidate : '';
@@ -46,7 +49,7 @@ export async function GET(
 ) {
   const session = await getServerSession(authOptions);
 
-  const guardedPaths = ['cancel-pro', 'export-activity', 'get-user-list', 'user-subscription', 'get-me', 'sync-subscription', 'get-link-list'];
+  const guardedPaths = ['cancel-pro', 'export-activity', 'get-user-list', 'user-subscription', 'get-me', 'sync-subscription', 'get-link-list', 'check-google-link'];
   if (guardedPaths.includes(params.path) && !session) {
     return NextResponse.json({ success: false, message: 'Authentication is required' }, { status: 401 });
   }
@@ -254,10 +257,12 @@ export async function POST(
       }
 
       case 'check-google-link': {
-        // Verify Google Drive link is publicly accessible
+        if (!isValidLinkUrl(req.url)) {
+          return NextResponse.json({ success: false, message: 'Invalid URL' }, { status: 400 });
+        }
         try {
-          const res = await fetch(req.url, { method: 'HEAD', redirect: 'follow' });
-          return NextResponse.json({ success: res.ok });
+          const res = await fetch(req.url, { method: 'HEAD', redirect: 'manual' });
+          return NextResponse.json({ success: res.ok || res.status === 301 || res.status === 302 });
         } catch {
           return NextResponse.json({ success: false });
         }

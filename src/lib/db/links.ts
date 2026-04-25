@@ -27,7 +27,7 @@ function formatLink(link: LinkRow) {
     emailNotify: link.email_notify,
     service: link.service,
     link: link.passdrop_url,
-    password: decryptLinkPassword(link.passdrop_pwd),
+    password: decryptLinkPassword(link.passdrop_pwd) ?? '',
     linkType: link.link_type,
     trackIp: link.track_ip,
     cost: link.is_paid ?? 0,
@@ -41,7 +41,7 @@ function isValidSlug(slug: string): boolean {
   return /^[a-zA-Z0-9_-]{3,60}$/.test(slug);
 }
 
-function isValidLinkUrl(url: string): boolean {
+export function isValidLinkUrl(url: string): boolean {
   try {
     const u = new URL(url);
     if (u.protocol !== 'https:') return false;
@@ -263,7 +263,7 @@ export async function getLinkDetail(slug: string, requestUserId?: number) {
       downloadCount: link.download_count,
       userId: link.user_id,
       ownerName: owner.user_name,
-      ownerEmail: owner.user_email,
+      ownerEmail: isOwner ? owner.user_email : '',
       ownerLevel: owner.is_pro,
       ownerLogo: owner.logo ?? '',
       requirePaid: (link.is_paid ?? 0) > 0 && !isOwner,

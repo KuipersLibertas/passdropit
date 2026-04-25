@@ -93,17 +93,18 @@ const SignInForm = ({ onShowForgotPassword, onCallback }: SignFormProps): JSX.El
     onShowForgotPassword();
   };
 
-  const handleFacebookLogin = async (name?: string, email?: string): Promise<void> => {
-    if (!name || !email) return;
+  const handleFacebookLogin = async (name?: string, email?: string, accessToken?: string): Promise<void> => {
+    if (!name || !email || !accessToken) return;
 
     if (isFbLoginProcessing) return;
 
     setIsFbLoginProcessing(true);
-    
+
     signIn('credentials', {
       redirect: false,
-      name: name,
-      email: email,
+      name,
+      email,
+      accessToken,
       type: 'facebook',
     })
       .then((res) => {
@@ -230,12 +231,16 @@ const SignInForm = ({ onShowForgotPassword, onCallback }: SignFormProps): JSX.El
           appId={`${process.env.NEXT_PUBLIC_FACEBOOK_CLIENT_ID}`}
           fields="name,email"
           scope="public_profile,email"
-          onProfileSuccess={(response) => {
-            handleFacebookLogin(response.name, response.email);
+          onSuccess={(authResponse) => {
+            // Store access token so onProfileSuccess can use it
+            (window as any).__fbAccessToken = authResponse.accessToken;
+          }}
+          onProfileSuccess={(profile) => {
+            handleFacebookLogin(profile.name, profile.email, (window as any).__fbAccessToken);
+            delete (window as any).__fbAccessToken;
           }}
           onFail={(error) => {
             console.log(error);
-            // handleFacebookLogin('gold jasson', 'gold.jasson93@gmail.com');
           }}
           render={({ onClick }) => (
             <LoadingButton

@@ -12,13 +12,20 @@ export const authOptions: NextAuthOptions = {
         password: { type: 'password' },
         name: { type: 'text' },
         type: { type: 'text' },
+        accessToken: { type: 'text' },
       },
       async authorize(credentials): Promise<any> {
-        // Facebook OAuth login path
+        // Facebook OAuth login path — verify access token server-side with Graph API
         if (credentials?.type === 'facebook') {
-          if (!credentials?.email || !credentials?.name) return null;
+          if (!credentials?.email || !credentials?.name || !credentials?.accessToken) return null;
           try {
-            const response = await facebookLogin(credentials.name, credentials.email);
+            const fbRes = await fetch(
+              `https://graph.facebook.com/me?fields=email,name&access_token=${encodeURIComponent(credentials.accessToken)}`
+            );
+            if (!fbRes.ok) return null;
+            const fbData = await fbRes.json();
+            if (fbData.error || fbData.email !== credentials.email) return null;
+            const response = await facebookLogin(fbData.name, fbData.email);
             if (!response.success) return null;
             return response.user;
           } catch (error: any) {

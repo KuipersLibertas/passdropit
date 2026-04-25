@@ -5,10 +5,9 @@
  *   SUPABASE_URL=https://... SUPABASE_SERVICE_ROLE_KEY=... node migrate.mjs
  *
  * CSV files expected in the same directory as this script:
- *   users.csv, file_list_user.csv, daily_downloads.csv,
- *   ip_tracker.csv, paid_links.csv, paid_membership.csv
+ *   users.csv, file_list_user.csv, daily_downloads.csv, ip_tracker.csv
  *
- * Run steps one by one — comment out completed steps.
+ * Run steps in order. Comment out completed steps on re-runs.
  */
 
 import { createClient } from '@supabase/supabase-js';
@@ -35,55 +34,17 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // ─── HELPERS ───────────────────────────────────────────────────────────────
 
-function readCsv(filename) {
-  return new Promise((resolve, reject) => {
-    const filepath = path.join(__dirname, filename);
-    if (!fs.existsSync(filepath)) {
-      console.warn(`⚠️  ${filename} not found — skipping.`);
-      return resolve([]);
-    }
-
-    const rows = [];
-    let headers = null;
-    let delimiter = ',';
-
-    const rl = createInterface({
-      input: createReadStream(filepath),
-      crlfDelay: Infinity,
-    });
-
-    rl.on('line', (line) => {
-      if (!headers) {
-        delimiter = line.includes(';') ? ';' : ',';
-      }
-      const cols = parseCsvLine(line, delimiter);
-      if (!headers) {
-        headers = cols.map((h) => h.trim());
-      } else {
-        const row = {};
-        headers.forEach((h, i) => { row[h] = cols[i] ?? ''; });
-        rows.push(row);
-      }
-    });
-
-    rl.on('close', () => resolve(rows));
-    rl.on('error', reject);
-  });
-}
-
 function parseCsvLine(line, delimiter = ',') {
   const result = [];
   let current = '';
   let inQuotes = false;
-
   for (let i = 0; i < line.length; i++) {
     const char = line[i];
     if (char === '"') {
       if (inQuotes && line[i + 1] === '"') { current += '"'; i++; }
       else { inQuotes = !inQuotes; }
     } else if (char === delimiter && !inQuotes) {
-      result.push(current);
-      current = '';
+      result.push(current); current = '';
     } else {
       current += char;
     }
@@ -92,79 +53,126 @@ function parseCsvLine(line, delimiter = ',') {
   return result;
 }
 
+/** Read entire CSV into memory — only use for smaller tables (< 200k rows). */
+function readCsv(filename) {
+  return new Promise((resolve, reject) => {
+    const filepath = path.join(__dirname, filename);
+    if (!fs.existsSync(filepath)) {
+      console.warn(`⚠️  ${filename} not found — skipping.`);
+      return resolve([]);
+    }
+    const rows = [];
+    let headers = null;
+    let delimiter = ',';
+    const rl = createInterface({ input: createReadStream(filepath), crlfDelay: Infinity });
+    rl.on('line', (line) => {
+      if (!headers) delimiter = line.includes(';') ? ';' : ',';
+      const cols = parseCsvLine(line, delimiter);
+      if (!headers) { headers = cols.map((h) => h.trim()); }
+      else { const row = {}; headers.forEach((h, i) => { row[h] = cols[i] ?? ''; }); rows.push(row); }
+    });
+    rl.on('close', () => resolve(rows));
+    rl.on('error', reject);
+  });
+}
+
+/**
+ * Stream a large CSV and process rows in batches without loading all into RAM.
+ * processBatch(rows) is called for each batch.
+ */
+async function streamCsv(filename, processBatch, batchSize = 500) {
+  const filepath = path.join(__dirname, filename);
+  if (!fs.existsSync(filepath)) {
+    console.warn(`⚠️  ${filename} not found — skipping.`);
+    return 0;
+  }
+  return new Promise((resolve, reject) => {
+    let headers = null;
+    let delimiter = ',';
+    let batch = [];
+    let total = 0;
+    let pending = Promise.resolve();
+    let rlClosed = false;
+
+    const rl = createInterface({ input: createReadStream(filepath), crlfDelay: Infinity });
+
+    rl.on('line', (line) => {
+      if (!headers) delimiter = line.includes(';') ? ';' : ',';
+      const cols = parseCsvLine(line, delimiter);
+      if (!headers) { headers = cols.map((h) => h.trim()); return; }
+      const row = {};
+      headers.forEach((h, i) => { row[h] = cols[i] ?? ''; });
+      batch.push(row);
+      if (batch.length >= batchSize) {
+        const toProcess = batch;
+        batch = [];
+        rl.pause();
+        pending = pending.then(() => processBatch(toProcess).then((n) => {
+          total += n;
+          process.stdout.write(`   ${total} rows inserted...\r`);
+          if (!rlClosed) rl.resume();
+        }));
+      }
+    });
+
+    rl.on('close', () => {
+      rlClosed = true;
+      const last = batch;
+      pending
+        .then(() => last.length ? processBatch(last) : Promise.resolve(0))
+        .then((n) => { total += (n || 0); resolve(total); })
+        .catch(reject);
+    });
+    rl.on('error', reject);
+  });
+}
+
 function toNull(val) {
   if (val === '' || val === 'NULL' || val === 'null' || val === undefined) return null;
   return val;
 }
-
 function toInt(val) {
-  const v = toNull(val);
-  if (v === null) return null;
-  const n = parseInt(v, 10);
-  return isNaN(n) ? null : n;
+  const v = toNull(val); if (v === null) return null;
+  const n = parseInt(v, 10); return isNaN(n) ? null : n;
 }
-
 function toFloat(val) {
-  const v = toNull(val);
-  if (v === null) return null;
-  const n = parseFloat(v);
-  return isNaN(n) ? null : n;
+  const v = toNull(val); if (v === null) return null;
+  const n = parseFloat(v); return isNaN(n) ? null : n;
 }
-
 function toBool(val) {
-  const v = toNull(val);
-  if (v === null) return false;
+  const v = toNull(val); if (v === null) return false;
   return v === '1' || v === 'true' || v === 'TRUE';
 }
-
 function toDate(val) {
   const v = toNull(val);
   if (!v || v === '0000-00-00') return null;
   if (/^\d{4}-\d{2}-\d{2}/.test(v)) return v.slice(0, 10);
-  const parts = v.split(/[-\/]/);
-  if (parts.length === 3) {
-    const [d, m, y] = parts;
-    if (y.length === 4) return `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
-  }
   return null;
 }
-
 function toTimestamp(val) {
-  const v = toNull(val);
-  if (!v) return null;
-  try {
-    const d = new Date(v);
-    if (isNaN(d.getTime())) return null;
-    return d.toISOString();
-  } catch { return null; }
+  const v = toNull(val); if (!v) return null;
+  try { const d = new Date(v); return isNaN(d.getTime()) ? null : d.toISOString(); } catch { return null; }
 }
 
-async function batchInsert(table, rows, batchSize = 100) {
-  if (rows.length === 0) {
-    console.log(`   ℹ️  No rows to insert into ${table}.`);
-    return;
-  }
-  let inserted = 0;
-  for (let i = 0; i < rows.length; i += batchSize) {
-    const batch = rows.slice(i, i + batchSize);
-    const { error } = await supabase.from(table).upsert(batch, { onConflict: 'id', ignoreDuplicates: true });
-    if (error) {
-      console.error(`❌  Error inserting into ${table} (batch ${i}–${i + batch.length}):`, error.message);
-      console.error('    First row of failed batch:', JSON.stringify(batch[0]));
-      throw error;
-    }
-    inserted += batch.length;
-    process.stdout.write(`   ${inserted}/${rows.length} rows into ${table}...\r`);
-  }
-  console.log(`\n✅  ${rows.length} rows upserted into ${table}`);
-}
-
-async function resetSequence(table) {
-  const { error } = await supabase.rpc('reset_sequence', { tbl: table });
+async function batchUpsert(table, rows, conflict = 'id') {
+  if (!rows.length) return 0;
+  const { error } = await supabase.from(table).upsert(rows, { onConflict: conflict, ignoreDuplicates: true });
   if (error) {
-    console.log(`   ⚠️  Run in Supabase SQL Editor to reset ${table} sequence:`);
-    console.log(`      SELECT setval('${table}_id_seq', (SELECT MAX(id) FROM ${table}));\n`);
+    console.error(`\n❌  Upsert error in ${table}:`, error.message);
+    console.error('    First row:', JSON.stringify(rows[0]));
+    throw error;
   }
+  return rows.length;
+}
+
+async function batchInsertIgnore(table, rows) {
+  if (!rows.length) return 0;
+  const { error } = await supabase.from(table).insert(rows);
+  if (error && !error.message.includes('duplicate')) {
+    console.error(`\n❌  Insert error in ${table}:`, error.message);
+    throw error;
+  }
+  return rows.length;
 }
 
 // ─── MIGRATION STEPS ───────────────────────────────────────────────────────
@@ -174,11 +182,10 @@ async function migrateUsers() {
   const rows = await readCsv('users.csv');
   if (!rows.length) return;
 
-  const mapped = rows.map((r) => ({
+  const allMapped = rows.map((r) => ({
     id:              toInt(r.id ?? r.user_id),
-    user_name:       toNull(r.user_name),
+    user_name:       toNull(r.user_name) ?? toNull(r.user_email)?.split('@')[0] ?? 'user',
     user_email:      toNull(r.user_email),
-    // The Laravel backend used user_password_hash; fall back to password_hash
     password_hash:   toNull(r.password_hash ?? r.user_password_hash ?? r.user_password),
     is_pro:          toInt(r.is_pro) ?? 0,
     stripe_id:       toNull(r.stripe_id),
@@ -188,8 +195,21 @@ async function migrateUsers() {
     paypal_id:       toNull(r.paypal_id),
   })).filter((r) => r.id && r.user_email && r.password_hash);
 
-  await batchInsert('users', mapped);
-  await resetSequence('users');
+  // Deduplicate by email — keep the row with the lowest id (oldest account)
+  const emailSeen = new Map();
+  for (const r of allMapped) {
+    const existing = emailSeen.get(r.user_email);
+    if (!existing || r.id < existing.id) emailSeen.set(r.user_email, r);
+  }
+  const mapped = Array.from(emailSeen.values());
+  console.log(`   (${allMapped.length - mapped.length} duplicate-email rows removed)`);
+
+  let inserted = 0;
+  for (let i = 0; i < mapped.length; i += 500) {
+    inserted += await batchUpsert('users', mapped.slice(i, i + 500));
+    process.stdout.write(`   ${inserted}/${mapped.length} users...\r`);
+  }
+  console.log(`\n✅  ${inserted} users`);
 }
 
 async function migrateLinks() {
@@ -197,23 +217,24 @@ async function migrateLinks() {
   const rows = await readCsv('file_list_user.csv');
   if (!rows.length) return;
 
+  console.log('    Loading valid user IDs from Supabase...');
+  const validUserIds = await fetchAllIds('users');
+  console.log(`    ${validUserIds.size} valid user IDs loaded.`);
+
   const serviceMap = { notion: 3, google_drive: 2, gdrive: 2, dropbox: 1 };
   const linkTypeMap = { link: 4, folder: 3, multiple: 2, single: 1 };
 
   const mapped = rows.map((r) => {
     const userId = toInt(r.user_id);
-    const serviceRaw = toNull(r.service);
-    const linkTypeRaw = toNull(r.link_type);
-
     return {
       id:                 toInt(r.id),
-      user_id:            userId === 0 ? null : userId,
+      user_id:            (userId && validUserIds.has(userId)) ? userId : null,
       dropbox_url:        toNull(r.dropbox_url),
       filename:           toNull(r.filename),
       passdrop_url:       toNull(r.passdrop_url),
       passdrop_pwd:       toNull(r.passdrop_pwd),
-      service:            serviceMap[serviceRaw] ?? toInt(serviceRaw) ?? 3,
-      link_type:          linkTypeMap[linkTypeRaw] ?? toInt(linkTypeRaw) ?? 4,
+      service:            serviceMap[toNull(r.service)] ?? toInt(r.service) ?? 3,
+      link_type:          linkTypeMap[toNull(r.link_type)] ?? toInt(r.link_type) ?? 4,
       is_verified:        toInt(r.is_verified) ?? 0,
       alt_email:          toNull(r.alt_email),
       download_count:     toInt(r.download_count) ?? 0,
@@ -230,134 +251,122 @@ async function migrateLinks() {
     };
   }).filter((r) => r.id && r.passdrop_url);
 
-  await batchInsert('file_list_user', mapped);
-  await resetSequence('file_list_user');
-}
-
-async function migrateDailyDownloads() {
-  console.log('\n📥  Migrating daily_downloads...');
-  const rows = await readCsv('daily_downloads.csv');
-  if (!rows.length) return;
-
-  const { data: links } = await supabase.from('file_list_user').select('id');
-  const validLinkIds = new Set((links ?? []).map((l) => l.id));
-  const { data: users } = await supabase.from('users').select('id');
-  const validUserIds = new Set((users ?? []).map((u) => u.id));
-
-  const mapped = rows.map((r) => ({
-    user_id:       toInt(r.user_id),
-    link_id:       toInt(r.link_id),
-    passdrop_url:  toNull(r.passdrop_url),
-    downloads:     toInt(r.downloads) ?? 0,
-    download_date: toDate(r.download_date),
-  })).filter((r) =>
-    r.link_id && validLinkIds.has(r.link_id) &&
-    r.user_id && validUserIds.has(r.user_id)
-  );
-
-  console.log(`   (${rows.length - mapped.length} rows skipped — orphaned FK)`);
-
-  if (mapped.length === 0) { console.log('   ℹ️  No rows to insert into daily_downloads.'); return; }
+  // Deduplicate by passdrop_url — keep lowest id
+  const urlSeen = new Map();
+  for (const r of mapped) {
+    const existing = urlSeen.get(r.passdrop_url);
+    if (!existing || r.id < existing.id) urlSeen.set(r.passdrop_url, r);
+  }
+  const deduped = Array.from(urlSeen.values());
+  console.log(`   (${mapped.length - deduped.length} duplicate-url rows removed)`);
 
   let inserted = 0;
-  for (let i = 0; i < mapped.length; i += 100) {
-    const batch = mapped.slice(i, i + 100);
-    const { error } = await supabase.from('daily_downloads').insert(batch);
-    if (error) {
-      console.error(`❌  Error inserting into daily_downloads:`, error.message);
-      throw error;
-    }
-    inserted += batch.length;
-    process.stdout.write(`   ${inserted}/${mapped.length} rows into daily_downloads...\r`);
+  for (let i = 0; i < deduped.length; i += 500) {
+    inserted += await batchUpsert('file_list_user', deduped.slice(i, i + 500));
+    process.stdout.write(`   ${inserted}/${deduped.length} links...\r`);
   }
-  console.log(`\n✅  ${inserted} rows inserted into daily_downloads`);
+  console.log(`\n✅  ${inserted} links`);
+}
+
+/** Fetch all IDs from a table in paginated batches (Supabase default cap is 1000/request). */
+async function fetchAllIds(table) {
+  const ids = new Set();
+  let from = 0;
+  const PAGE = 1000;
+  while (true) {
+    const { data, error } = await supabase.from(table).select('id').range(from, from + PAGE - 1);
+    if (error) throw error;
+    if (!data || data.length === 0) break;
+    data.forEach((r) => ids.add(r.id));
+    if (data.length < PAGE) break;
+    from += PAGE;
+  }
+  return ids;
 }
 
 async function migrateIpTracker() {
-  console.log('\n📥  Migrating ip_tracker...');
-  const rows = await readCsv('ip_tracker.csv');
-  if (!rows.length) return;
+  console.log('\n📥  Migrating ip_tracker (streaming)...');
+  console.log('    Loading valid link IDs from Supabase...');
+  const validLinkIds = await fetchAllIds('file_list_user');
+  console.log(`    ${validLinkIds.size} valid link IDs loaded.`);
 
-  const { data: links } = await supabase.from('file_list_user').select('id');
-  const validLinkIds = new Set((links ?? []).map((l) => l.id));
+  // Find the max id already inserted so we can resume
+  const { data: maxRow } = await supabase.from('ip_tracker').select('id').order('id', { ascending: false }).limit(1);
+  const resumeFromId = maxRow?.[0]?.id ?? 0;
+  if (resumeFromId > 0) console.log(`    Resuming from id > ${resumeFromId}`);
+  let skipped = 0;
 
-  const mapped = rows.map((r) => ({
-    id:       toInt(r.id),
-    link_id:  toInt(r.link_id),
-    ip:       toNull(r.ip),
-    city:     toNull(r.city),
-    country:  toNull(r.country),
-    reserved: toNull(r.reserved),
-    latlong:  toNull(r.latlong),
-  })).filter((r) => r.id && r.link_id && validLinkIds.has(r.link_id));
+  const total = await streamCsv('ip_tracker.csv', async (rows) => {
+    const mapped = rows.map((r) => ({
+      id:       toInt(r.id),
+      link_id:  toInt(r.link_id),
+      ip:       toNull(r.ip),
+      city:     toNull(r.city),
+      country:  toNull(r.country),
+      reserved: toNull(r.reserved),
+      latlong:  toNull(r.latlong),
+    })).filter((r) => {
+      if (!r.id || !r.link_id || !validLinkIds.has(r.link_id) || r.id <= resumeFromId) { skipped++; return false; }
+      return true;
+    });
 
-  console.log(`   (${rows.length - mapped.length} rows skipped — orphaned FK)`);
-  await batchInsert('ip_tracker', mapped);
-  await resetSequence('ip_tracker');
+    if (!mapped.length) return 0;
+    return batchUpsert('ip_tracker', mapped);
+  }, 500);
+
+  console.log(`\n✅  ${total} ip_tracker rows (${skipped} skipped — orphaned FK)`);
 }
 
-async function migratePaidLinks() {
-  console.log('\n📥  Migrating paid_links...');
-  const rows = await readCsv('paid_links.csv');
-  if (!rows.length) return;
+async function migrateDailyDownloads() {
+  console.log('\n📥  Migrating daily_downloads (streaming ~2M rows — this will take a while)...');
+  console.log('    Loading valid link and user IDs from Supabase...');
+  const [validLinkIds, validUserIds] = await Promise.all([
+    fetchAllIds('file_list_user'),
+    fetchAllIds('users'),
+  ]);
+  console.log(`    ${validLinkIds.size} links, ${validUserIds.size} users loaded.`);
+  let skipped = 0;
 
-  const mapped = rows.map((r) => ({
-    id:         toInt(r.id),
-    user_id:    toInt(r.user_id),
-    link_id:    toInt(r.link_id),
-    type:       toInt(r.type) ?? 1,
-    amount:     toFloat(r.amount),
-    status:     toInt(r.status) ?? 0,
-    created_at: toTimestamp(r.created_at),
-    updated_at: toTimestamp(r.updated_at),
-  })).filter((r) => r.id);
+  const total = await streamCsv('daily_downloads.csv', async (rows) => {
+    const mapped = rows.map((r) => {
+      const userId = toInt(r.user_id);
+      return {
+        user_id:       (userId && validUserIds.has(userId)) ? userId : null,
+        link_id:       toInt(r.link_id),
+        passdrop_url:  toNull(r.passdrop_url),
+        downloads:     toInt(r.downloads) ?? 0,
+        download_date: toDate(r.download_date),
+      };
+    }).filter((r) => {
+      if (!r.link_id || !validLinkIds.has(r.link_id)) { skipped++; return false; }
+      return true;
+    });
 
-  await batchInsert('paid_links', mapped);
-  await resetSequence('paid_links');
-}
+    if (!mapped.length) return 0;
+    return batchInsertIgnore('daily_downloads', mapped);
+  }, 500);
 
-async function migratePaidMembership() {
-  console.log('\n📥  Migrating paid_membership...');
-  const rows = await readCsv('paid_membership.csv');
-  if (!rows.length) return;
-
-  const mapped = rows.map((r) => ({
-    id:         toInt(r.id),
-    user_id:    toInt(r.user_id),
-    type:       toInt(r.type),
-    amount:     toFloat(r.amount),
-    status:     toInt(r.status) ?? 0,
-    created_at: toTimestamp(r.created_at),
-    updated_at: toTimestamp(r.updated_at),
-  })).filter((r) => r.id);
-
-  await batchInsert('paid_membership', mapped);
-  await resetSequence('paid_membership');
+  console.log(`\n✅  ${total} daily_downloads rows (${skipped} skipped — orphaned FK)`);
 }
 
 // ─── MAIN ──────────────────────────────────────────────────────────────────
 
 async function main() {
   console.log('🚀  Passdropit migration starting...');
-  console.log(`    Supabase URL: ${SUPABASE_URL}\n`);
+  console.log(`    Supabase: ${SUPABASE_URL}\n`);
 
   try {
-    // Run steps in order. Comment out completed steps on re-runs.
     await migrateUsers();
     await migrateLinks();
-    await migrateIpTracker();
-    await migratePaidLinks();
-    await migratePaidMembership();
+    // ip_tracker already complete — comment back in if re-running from scratch
+    // await migrateIpTracker();
     await migrateDailyDownloads();
 
     console.log('\n🎉  Migration complete!');
     console.log('\n⚠️  Run these in the Supabase SQL Editor to fix auto-increment sequences:');
     console.log("    SELECT setval('users_id_seq', (SELECT MAX(id) FROM users));");
     console.log("    SELECT setval('file_list_user_id_seq', (SELECT MAX(id) FROM file_list_user));");
-    console.log("    SELECT setval('daily_downloads_id_seq', (SELECT MAX(id) FROM daily_downloads));");
     console.log("    SELECT setval('ip_tracker_id_seq', (SELECT MAX(id) FROM ip_tracker));");
-    console.log("    SELECT setval('paid_links_id_seq', (SELECT MAX(id) FROM paid_links));");
-    console.log("    SELECT setval('paid_membership_id_seq', (SELECT MAX(id) FROM paid_membership));");
   } catch (err) {
     console.error('\n❌  Migration failed:', err.message);
     process.exit(1);

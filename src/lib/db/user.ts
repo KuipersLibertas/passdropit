@@ -115,6 +115,20 @@ export async function syncSubscription(userId: number) {
 }
 
 export async function cancelPro(userId: number) {
+  const { data: dbUser } = await supabase
+    .from('users')
+    .select('subscription_id')
+    .eq('id', userId)
+    .single();
+
+  if (dbUser?.subscription_id) {
+    try {
+      await getStripe().subscriptions.update(dbUser.subscription_id, { cancel_at_period_end: true });
+    } catch (err: any) {
+      console.error(`cancelPro Stripe error userId=${userId}:`, err.message);
+    }
+  }
+
   await supabase.from('users').update({ is_pro: 0 }).eq('id', userId);
   await supabase
     .from('file_list_user')

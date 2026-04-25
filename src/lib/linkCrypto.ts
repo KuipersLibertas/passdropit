@@ -1,4 +1,4 @@
-import crypto from 'crypto';
+import crypto, { timingSafeEqual } from 'crypto';
 
 const ALGO   = 'aes-256-gcm';
 const PREFIX = 'enc:';
@@ -19,8 +19,8 @@ export function encryptLinkPassword(plaintext: string): string {
   return PREFIX + Buffer.concat([iv, authTag, encrypted]).toString('base64');
 }
 
-export function decryptLinkPassword(stored: string | null): string {
-  if (!stored) return '';
+export function decryptLinkPassword(stored: string | null): string | null {
+  if (!stored) return null;
   if (!stored.startsWith(PREFIX)) return stored;
   try {
     const key      = getKey();
@@ -32,11 +32,13 @@ export function decryptLinkPassword(stored: string | null): string {
     decipher.setAuthTag(authTag);
     return decipher.update(encrypted).toString('utf8') + decipher.final('utf8');
   } catch {
-    return '';
+    return null;
   }
 }
 
 export function verifyLinkPassword(stored: string | null, supplied: string): boolean {
   const plaintext = decryptLinkPassword(stored);
-  return plaintext === supplied;
+  if (plaintext === null) return false;
+  if (plaintext.length !== supplied.length) return false;
+  return timingSafeEqual(Buffer.from(plaintext, 'utf8'), Buffer.from(supplied, 'utf8'));
 }
