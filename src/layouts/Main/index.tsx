@@ -15,10 +15,11 @@ import {
   AppBar,
   Box,
 } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { useNavigationMenu } from '@/layouts/Main/navigation';
 import { ApplicationProvider } from '@/contexts/ApplicationContext';
 import { SessionProvider } from 'next-auth/react';
-import { UserLevel } from '@/utils/constants';
+import { UserLevel, ThemeMode } from '@/utils/constants';
 import { useSession } from 'next-auth/react';
 import Script from 'next/script';
 
@@ -32,7 +33,9 @@ const MainLayout = ({
   children,
 }: MainLayoutProps): JSX.Element => {
   const { data: session } = useSession();
-  
+  const theme = useTheme();
+  const isLight = theme.palette.mode === ThemeMode.light;
+
   const [openSidebar, setOpenSidebar] = useState<boolean>(false);
   const [showSignIn, setShowSignIn] = useState<boolean>(false);
   const [showForgotPassword, setShowForgotPassword] = useState<boolean>(false);
@@ -139,15 +142,27 @@ const MainLayout = ({
                 position={'sticky'}
                 sx={{
                   top: 0,
-                  backgroundColor: trigger ? 'rgba(255,255,255,0.92)' : '#ffffff',
+                  backgroundColor: isLight
+                    ? (trigger ? 'rgba(255,255,255,0.92)' : '#ffffff')
+                    : (trigger ? 'rgba(15,23,42,0.92)' : '#0f172a'),
                   backdropFilter: trigger ? 'blur(20px)' : 'none',
                   WebkitBackdropFilter: trigger ? 'blur(20px)' : 'none',
-                  borderBottom: '1px solid rgba(15,23,42,0.07)',
+                  borderBottom: isLight
+                    ? '1px solid rgba(15,23,42,0.07)'
+                    : '1px solid rgba(241,245,249,0.07)',
                   transition: 'background-color 0.3s ease',
-                  '& .MuiTypography-root': { color: '#0f172a' },
-                  '& .MuiSvgIcon-root': { color: '#475569' },
-                  '& .MuiIconButton-root': { color: '#475569' },
-                  '& a.nav-link span': { color: '#0f172a' },
+                  ...(isLight && {
+                    '& .MuiTypography-root': { color: '#0f172a' },
+                    '& .MuiSvgIcon-root': { color: '#475569' },
+                    '& .MuiIconButton-root': { color: '#475569' },
+                    '& a.nav-link span': { color: '#0f172a' },
+                  }),
+                  ...(!isLight && {
+                    '& .MuiTypography-root': { color: '#f1f5f9' },
+                    '& .MuiSvgIcon-root': { color: '#94a3b8' },
+                    '& .MuiIconButton-root': { color: '#94a3b8' },
+                    '& a.nav-link span': { color: '#f1f5f9' },
+                  }),
                 }}
                 elevation={0}
               >
