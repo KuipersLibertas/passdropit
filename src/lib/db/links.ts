@@ -373,11 +373,9 @@ export async function getAnalytics(userId: number, linkId: number) {
 
   return {
     success: true as const,
-    data: {
-      ipCount: (ipData ?? []).length,
-      downloadCount: link.download_count,
-      city: Object.entries(cityMap).map(([city, count]) => ({ city, count })),
-    },
+    totalDownloads: link.download_count ?? 0,
+    totalVisitors: (ipData ?? []).length,
+    cities: Object.entries(cityMap).map(([city, visitors]) => ({ city, visitors })),
   };
 }
 
