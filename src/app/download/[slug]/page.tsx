@@ -3,14 +3,14 @@ import React from 'react';
 import DownloadView from '@/views/Download';
 import { redirect } from 'next/navigation';
 import { IServerLinkDetail } from '@/types';
-import { getLinkDetailInfo } from '@/api';
+import { getLinkDetail } from '@/lib/db/links';
 import MainLayout from '@/layouts/Main';
 
 const ValidationCheck = async ({ params }: { params: { slug: string } }): Promise<JSX.Element> => {
   let linkInfo: IServerLinkDetail|null = null;
 
   try {
-    const response = await getLinkDetailInfo(params.slug);    
+    const response = await getLinkDetail(params.slug);
     if (response.success) {
       linkInfo = response.data;
     } else {

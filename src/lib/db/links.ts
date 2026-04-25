@@ -229,7 +229,7 @@ export async function deleteLink(userId: number, id: number) {
 export async function getLinkDetail(slug: string, requestUserId?: number) {
   const { data: link, error } = await supabase
     .from('file_list_user')
-    .select('*, users!inner(id, user_name, is_pro, logo)')
+    .select('*, users!inner(id, user_name, user_email, is_pro, logo)')
     .eq('passdrop_url', slug)
     .single();
 
@@ -243,7 +243,7 @@ export async function getLinkDetail(slug: string, requestUserId?: number) {
     return { success: false as const, message: 'This link has reached its download limit' };
   }
 
-  const owner = link.users as { id: number; user_name: string; is_pro: number; logo: string | null };
+  const owner = link.users as { id: number; user_name: string; user_email: string; is_pro: number; logo: string | null };
   const isOwner = !!requestUserId && requestUserId === link.user_id;
   const urls = link.dropbox_url ? link.dropbox_url.split(',') : [];
 
@@ -263,6 +263,7 @@ export async function getLinkDetail(slug: string, requestUserId?: number) {
       downloadCount: link.download_count,
       userId: link.user_id,
       ownerName: owner.user_name,
+      ownerEmail: owner.user_email,
       ownerLevel: owner.is_pro,
       ownerLogo: owner.logo ?? '',
       requirePaid: (link.is_paid ?? 0) > 0 && !isOwner,

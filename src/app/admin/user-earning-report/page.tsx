@@ -6,24 +6,18 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import { IUser } from '@/types';
-import { getUserList } from '@/api';
+import { getUserList } from '@/lib/db/admin';
 import { UserLevel } from '@/utils/constants';
 
 const UserEarningReport = async (): Promise<JSX.Element> => {
   const session = await getServerSession(authOptions);
-  
-  if (session === null) {
-    redirect('/signin');
-  }
 
-  if (session?.user.level != UserLevel.Admin) {
-    redirect('/');
-  }
+  if (!session) redirect('/signin');
+  if (session?.user.level != UserLevel.Admin) redirect('/');
 
   let userList: IUser[] = [];
   try {
-    const response = await getUserList();
-    userList = response.data;
+    userList = await getUserList() as any;
   } catch (error: any) {
     console.log(error.message);
   }

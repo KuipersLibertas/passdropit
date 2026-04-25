@@ -6,21 +6,19 @@ import { default as ManageLinkView } from '@/views/ManageLink';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { redirect } from 'next/navigation';
-import { getLinkList } from '@/api';
+import { getLinkList } from '@/lib/db/links';
 
 const ManageLink = async (): Promise<JSX.Element> => {
   const session = await getServerSession(authOptions);
-  if (session === null) {
-    redirect('/signin');
-  }
+  if (!session) redirect('/signin');
 
-  let linkList = [];
+  let linkList: any[] = [];
   try {
-    linkList = await getLinkList();
+    linkList = await getLinkList(session.user.id as number);
   } catch (error) {
     console.log(error);
   }
-  
+
   return (
     <MainLayout>
       <Script src="https://www.dropbox.com/static/api/1/dropins.js" id="dropboxjs" data-app-key="pg833ddyw39cs0m" />
