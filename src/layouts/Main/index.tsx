@@ -139,11 +139,19 @@ const MainLayout = ({
                 position={'sticky'}
                 sx={{
                   top: 0,
-                  backgroundColor: 'background.paper',
+                  backgroundColor: trigger ? 'rgba(255,255,255,0.92)' : '#ffffff',
+                  backdropFilter: trigger ? 'blur(20px)' : 'none',
+                  WebkitBackdropFilter: trigger ? 'blur(20px)' : 'none',
+                  borderBottom: '1px solid rgba(15,23,42,0.07)',
+                  transition: 'background-color 0.3s ease',
+                  '& .MuiTypography-root': { color: '#0f172a' },
+                  '& .MuiSvgIcon-root': { color: '#475569' },
+                  '& .MuiIconButton-root': { color: '#475569' },
+                  '& a.nav-link span': { color: '#0f172a' },
                 }}
-                elevation={trigger ? 1 : 0}
+                elevation={0}
               >
-                <Container paddingY={0} sx={{ display: 'flex', alignItems: 'center', height: '76px' }}>
+                <Container paddingY={0} sx={{ display: 'flex', alignItems: 'center', height: '96px' }}>
                   <Topbar
                     onSidebarOpen={handleSidebarOpen}
                     menus={menus}
