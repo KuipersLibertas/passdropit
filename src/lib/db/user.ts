@@ -64,7 +64,7 @@ export async function upgradePro(userId: number) {
     mode: 'subscription',
     payment_method_types: ['card'],
     line_items: [{ price: STRIPE_PRICE_ID, quantity: 1 }],
-    success_url: `${SITE_URL}/api/auth/session-refresh?callbackUrl=/user/upgrade-pro/success`,
+    success_url: `${SITE_URL}/user/upgrade-pro/success`,
     cancel_url: `${SITE_URL}/prosignup`,
     subscription_data: {
       trial_period_days: 15,

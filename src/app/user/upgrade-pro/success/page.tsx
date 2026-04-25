@@ -1,20 +1,17 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { Box, CircularProgress, Typography } from '@mui/material';
+import { CheckCircleOutline } from '@mui/icons-material';
 
 export default function UpgradeProSuccess() {
-  const router = useRouter();
-
   useEffect(() => {
-    // Session is refreshed server-side via /api/auth/session-refresh
-    // This page is shown momentarily before redirect
+    // Sync Stripe status and re-encode the session JWT, then land on plan page
     const timer = setTimeout(() => {
-      router.push('/user/plan');
-    }, 3000);
+      window.location.href = '/api/auth/session-refresh?sync=1&callbackUrl=/user/plan';
+    }, 2000);
     return () => clearTimeout(timer);
-  }, [router]);
+  }, []);
 
   return (
     <Box
@@ -27,12 +24,13 @@ export default function UpgradeProSuccess() {
         gap: 3,
       }}
     >
-      <CircularProgress size={48} />
+      <CheckCircleOutline sx={{ fontSize: 64, color: 'success.main' }} />
       <Typography variant="h5" fontWeight={600}>
-        Activating your Pro account…
+        Payment successful!
       </Typography>
+      <CircularProgress size={28} />
       <Typography color="text.secondary">
-        You will be redirected shortly.
+        Activating your Pro account…
       </Typography>
     </Box>
   );
