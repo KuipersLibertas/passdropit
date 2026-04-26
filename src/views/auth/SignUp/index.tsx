@@ -1,9 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import * as yup from 'yup';
 import Container from '@/components/Container';
-import FacebookLogin from '@greatsumini/react-facebook-login';
 
 import { useFormik } from 'formik';
 import {
@@ -62,6 +61,30 @@ const SignUp = (): JSX.Element => {
   const theme = useTheme();
   const [isSignUpProcessing, setIsSignUpProcessing] = useState<boolean>(false);
   const [isFbLoginProcessing, setIsFbLoginProcessing] = useState<boolean>(false);
+  const [fbReady, setFbReady] = useState<boolean>(false);
+
+  useEffect(() => {
+    const appId = process.env.NEXT_PUBLIC_FACEBOOK_CLIENT_ID;
+    if (!appId) return;
+
+    const initFB = () => {
+      window.FB.init({ appId, cookie: true, xfbml: false, version: 'v19.0' });
+      setFbReady(true);
+    };
+
+    if (window.FB) { initFB(); return; }
+
+    window.fbAsyncInit = initFB;
+
+    if (!document.getElementById('facebook-jssdk')) {
+      const script = document.createElement('script');
+      script.id = 'facebook-jssdk';
+      script.src = 'https://connect.facebook.net/en_US/sdk.js';
+      script.async = true;
+      script.defer = true;
+      document.body.appendChild(script);
+    }
+  }, []);
 
   const initialValues: ISignUpFormFields = {    
     firstName: '', 
@@ -111,17 +134,31 @@ const SignUp = (): JSX.Element => {
     onSubmit,
   });
 
-  const handleFacebookLogin = async (name?: string, email?: string): Promise<void> => {
-    if (!name || !email) return;
+  const handleFacebookButtonClick = (): void => {
+    if (!fbReady || isFbLoginProcessing) return;
+
+    window.FB.login((response: any) => {
+      if (response.authResponse) {
+        const accessToken = response.authResponse.accessToken;
+        window.FB.api('/me', { fields: 'name,email' }, (profile: any) => {
+          handleFacebookLogin(profile.name, profile.email, accessToken);
+        });
+      }
+    }, { scope: 'public_profile,email' });
+  };
+
+  const handleFacebookLogin = async (name?: string, email?: string, accessToken?: string): Promise<void> => {
+    if (!name || !email || !accessToken) return;
 
     if (isFbLoginProcessing) return;
 
     setIsFbLoginProcessing(true);
-    
+
     signIn('credentials', {
       redirect: false,
-      name: name,
-      email: email,
+      name,
+      email,
+      accessToken,
       type: 'facebook',
     })
       .then((res) => {
@@ -275,40 +312,21 @@ const SignUp = (): JSX.Element => {
         <Box py="3rem" width={1}>
           <Divider sx={{ color: '#aaa' }}>Or</Divider>
         </Box>
-        <FacebookLogin
-          appId={`${process.env.NEXT_PUBLIC_FACEBOOK_CLIENT_ID}`}
-          fields="name,email"
-          scope="public_profile,email"
-          onProfileSuccess={(response) => {
-            handleFacebookLogin(response.name, response.email);
-          }}
-          onFail={(error) => {
-            console.log(error);
-            // handleFacebookLogin('gold jasson', 'gold.jasson93@gmail.com');
-          }}
-          render={({ onClick }) => (
-            <LoadingButton
-              type="button"
-              size="large"
-              variant="contained"
-              color="error"
-              sx={{
-                alignItems: 'center',
-              }}
-              onClick={onClick}
-              loading={isFbLoginProcessing}
-            >
-              <Box component="span" mt={1}>
-                <FacebookIcon
-                  width={18}
-                  height={18}
-                  color={theme.palette.common.white}
-                />
-              </Box>
-              &nbsp;|&nbsp;Sign in With Facebook
-            </LoadingButton>
-          )}
-        />
+        <LoadingButton
+          type="button"
+          size="large"
+          variant="contained"
+          color="error"
+          disabled={!fbReady}
+          sx={{ alignItems: 'center' }}
+          onClick={handleFacebookButtonClick}
+          loading={isFbLoginProcessing}
+        >
+          <Box component="span" mt={1}>
+            <FacebookIcon width={18} height={18} color={theme.palette.common.white} />
+          </Box>
+          &nbsp;|&nbsp;Sign in With Facebook
+        </LoadingButton>
       </Box>  
     </Container>
   );
