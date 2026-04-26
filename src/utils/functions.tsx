@@ -53,11 +53,23 @@ export const chooseGoogleDriveLink = (callback: (chooseLink: IChooseLink) => voi
     });
   };
 
+  console.log('[Google Drive] window.gapi:', typeof window.gapi, '| window.google:', typeof (window as any).google);
+
+  if (!(window as any).google?.accounts?.oauth2) {
+    console.error('[Google Drive] Google Identity Services not loaded yet (window.google.accounts.oauth2 is undefined)');
+    return;
+  }
+  if (!window.gapi) {
+    console.error('[Google Drive] gapi not loaded yet');
+    return;
+  }
+
   // Use Google Identity Services token client (replaces deprecated gapi.auth.authorize)
-  const tokenClient = window.google.accounts.oauth2.initTokenClient({
+  const tokenClient = (window as any).google.accounts.oauth2.initTokenClient({
     client_id: process.env.NEXT_PUBLIC_GOOGLE_PICKER_CLIENT_ID,
     scope: process.env.NEXT_PUBLIC_GOOGLE_PICKER_SCOPE_URL ?? 'https://www.googleapis.com/auth/drive.readonly',
     callback: (response: any) => {
+      console.log('[Google Drive] token response:', response);
       if (response.error || !response.access_token) return;
       openPicker(response.access_token);
     },

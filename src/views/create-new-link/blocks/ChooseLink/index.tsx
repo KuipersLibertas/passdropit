@@ -33,10 +33,13 @@ const ChooseLinkType = ({ onChooseLink }: ChooseLinkTypeProps): JSX.Element => {
     if (type === ServiceType.DropBox) {
       chooseDropBoxLink(onChooseLink);
     } else {
-      // google drive
-      chooseGoogleDriveLink((chooseLink: IChooseLink) => {
-        checkGoogleDrivePublic(chooseLink);
-      });
+      try {
+        chooseGoogleDriveLink((chooseLink: IChooseLink) => {
+          checkGoogleDrivePublic(chooseLink);
+        });
+      } catch (err: any) {
+        console.error('[Google Drive] chooseGoogleDriveLink threw:', err?.message ?? err);
+      }
     }    
   };
 
