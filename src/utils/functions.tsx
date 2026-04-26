@@ -21,116 +21,49 @@ export const generateLink = (): string => {
   return retVal;
 };
 
-let googleAuthToken = '';
-let googlePicker: any = null;
 export const chooseGoogleDriveLink = (callback: (chooseLink: IChooseLink) => void) => {
-  const handleGoogleAuthApiLoad = (): void => {
-    window.gapi.auth.authorize(
-      {
-        'client_id': process.env.NEXT_PUBLIC_GOOGLE_PICKER_CLIENT_ID,
-        'scope': process.env.NEXT_PUBLIC_GOOGLE_PICKER_SCOPE_URL,
-        'immediate': false
-      },
-      handleGoogleAuthResult
-    );
-  };
-
-  const handleGoogleAuthResult = (result: any): void => {
-    if (result && !result.error) {
-      googleAuthToken = result.access_token;
-      
-      window.gapi.load('picker', {'callback': createGooglePicker});
-    }
-  };
-
-  const createGooglePicker = (): void => {
-    if (googlePicker === null) {
-      const view = new window.google.picker.DocsView().setOwnedByMe(true);  
-      //view.setMimeTypes('image/png,image/jpeg,image/jpg');
-      googlePicker = new window.google.picker.PickerBuilder()
-        .enableFeature(window.google.picker.Feature.NAV_HIDDEN)
-        //.enableFeature(google.picker.Feature.MULTISELECT_ENABLED)
-        .setAppId(process.env.NEXT_PUBLIC_GOOGLE_PICKER_APP_ID)
-        .setOAuthToken(googleAuthToken)
-        .addView(view)
-        .addView(new window.google.picker.DocsUploadView())
-        .setDeveloperKey(process.env.NEXT_PUBLIC_GOOGLE_PICKER_DEV_KEY)
-        .setCallback(googlePickerCallback)
-        .build();
-      googlePicker.setVisible(true);
-    } else {
-      googlePicker.setVisible(true);
-    }
-  };
-
-  const googlePickerCallback = (data: any): void => {
-    if (data.action == window.google.picker.Action.PICKED) {
+  const pickerCallback = (data: any): void => {
+    if (data.action === window.google.picker.Action.PICKED) {
       const doc = data[window.google.picker.Response.DOCUMENTS][0];
       const fileName = doc[window.google.picker.Document.NAME];
       const url = doc[window.google.picker.Document.URL];
-          
-      const service = ServiceType.GoogleDrive;      
-      
-      const link = generateLink();
-      const password = generatePassword();
-      const choseData: IChooseLink = {
-        link: link,
-        password: password,
-        service,
+      callback({
+        link: generateLink(),
+        password: generatePassword(),
+        service: ServiceType.GoogleDrive,
         linkType: LinkType.Single,
-        files: [
-          {
-            name: fileName,
-            url: decodeURIComponent(url),
-            icon: doc.iconUrl
-          }
-        ]       
-      };
-
-      callback(choseData);
-    }  
+        files: [{ name: fileName, url: decodeURIComponent(url), icon: doc.iconUrl }],
+      });
+    }
   };
 
-  if (!googleAuthToken.length) {
-    window.gapi.load('auth', {'callback': handleGoogleAuthApiLoad});
-  } else {
-    window.gapi.load('picker', {'callback': createGooglePicker});
-  }
+  const openPicker = (accessToken: string): void => {
+    window.gapi.load('picker', () => {
+      const view = new window.google.picker.DocsView().setOwnedByMe(true);
+      const picker = new window.google.picker.PickerBuilder()
+        .enableFeature(window.google.picker.Feature.NAV_HIDDEN)
+        .setAppId(process.env.NEXT_PUBLIC_GOOGLE_PICKER_APP_ID)
+        .setOAuthToken(accessToken)
+        .addView(view)
+        .addView(new window.google.picker.DocsUploadView())
+        .setDeveloperKey(process.env.NEXT_PUBLIC_GOOGLE_PICKER_DEV_KEY)
+        .setCallback(pickerCallback)
+        .build();
+      picker.setVisible(true);
+    });
+  };
 
-  if (process.env.NODE_ENV === 'development') {
-    //Todo: delete this code in production
-    window.gapi.load('picker', {'callback': () => {
-      const data = {
-        action: 'picked',
-        docs: [
-          {
-            'id': '1ylzlHl6-IfFUB09oWQo6Bq-MybMt9v4h',
-            'serviceId': 'DoclistBlob',
-            'mimeType': 'application/x-msdownload',
-            'name': 'Vosk.dll',
-            'description': '',
-            'type': 'file',
-            'lastEditedUtc': 1700049176184,
-            'iconUrl': 'https://drive-thirdparty.googleusercontent.com/16/type/application/x-msdownload',
-            'url': 'https://drive.google.com/file/d/1ylzlHl6-IfFUB09oWQo6Bq-MybMt9v4h/view?usp=drive_web',
-            'embedUrl': 'https://drive.google.com/file/d/1ylzlHl6-IfFUB09oWQo6Bq-MybMt9v4h/preview?usp=drive_web',
-            'sizeBytes': 7680,
-            'parentId': '0AHezxz2BLAJMUk9PVA',
-            'isShared': true
-          }
-        ],
-        viewToken: [
-          'all',
-          null,
-          {
-            'ownedByMe': true
-          }
-        ]
-      };
-      
-      googlePickerCallback(data);
-    }});
-  }
+  // Use Google Identity Services token client (replaces deprecated gapi.auth.authorize)
+  const tokenClient = window.google.accounts.oauth2.initTokenClient({
+    client_id: process.env.NEXT_PUBLIC_GOOGLE_PICKER_CLIENT_ID,
+    scope: process.env.NEXT_PUBLIC_GOOGLE_PICKER_SCOPE_URL ?? 'https://www.googleapis.com/auth/drive.readonly',
+    callback: (response: any) => {
+      if (response.error || !response.access_token) return;
+      openPicker(response.access_token);
+    },
+  });
+
+  tokenClient.requestAccessToken({ prompt: '' });
 };
 
 export const chooseDropBoxLink = (callback: (chooseLink: IChooseLink) => void) => {

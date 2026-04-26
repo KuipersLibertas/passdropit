@@ -18,6 +18,7 @@ const ChooseFile = async () => {
     <MainLayout>
       <Script src="https://www.dropbox.com/static/api/1/dropins.js" id="dropboxjs" data-app-key={process.env.NEXT_PUBLIC_DROPBOX_APP_KEY} />
       <Script src="https://apis.google.com/js/api.js" />
+      <Script src="https://accounts.google.com/gsi/client" async />
       <ChooseFileView />
     </MainLayout>
   );
