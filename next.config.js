@@ -16,7 +16,7 @@ const securityHeaders = [
       "font-src 'self' data: https://fonts.gstatic.com",
       "img-src 'self' data: blob: https:",
       "connect-src 'self' https:",
-      "frame-src https://bid.g.doubleclick.net https://www.facebook.com",
+      "frame-src https://bid.g.doubleclick.net https://www.facebook.com https://docs.google.com https://drive.google.com https://accounts.google.com",
       "frame-ancestors 'none'",
       "object-src 'none'",
       "base-uri 'self'",
