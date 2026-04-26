@@ -22,7 +22,8 @@ const ManageLink = async (): Promise<JSX.Element> => {
   return (
     <MainLayout>
       <Script src="https://www.dropbox.com/static/api/1/dropins.js" id="dropboxjs" data-app-key={process.env.NEXT_PUBLIC_DROPBOX_APP_KEY} />
-      <Script src="https://apis.google.com/js/api.js" />
+      <Script src="https://apis.google.com/js/api.js" id="gapijs" />
+      <Script src="https://accounts.google.com/gsi/client" id="gisjs" />
       <ManageLinkView data={linkList} />
     </MainLayout>
   );
