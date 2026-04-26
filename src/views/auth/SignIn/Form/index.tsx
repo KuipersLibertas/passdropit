@@ -59,23 +59,27 @@ const SignInForm = ({ onShowForgotPassword, onCallback }: SignFormProps): JSX.El
 
   useEffect(() => {
     const appId = process.env.NEXT_PUBLIC_FACEBOOK_CLIENT_ID;
-    if (!appId) return;
+    console.log('[FB] appId:', appId ? `${appId.slice(0,6)}…` : 'MISSING');
+
+    if (!appId) {
+      console.error('[FB] NEXT_PUBLIC_FACEBOOK_CLIENT_ID is not set');
+      return;
+    }
 
     const initFB = () => {
-      window.FB.init({
-        appId,
-        cookie: true,
-        xfbml: false,
-        version: 'v19.0',
-      });
+      console.log('[FB] calling FB.init');
+      window.FB.init({ appId, cookie: true, xfbml: false, version: 'v19.0' });
+      console.log('[FB] FB.init done — setting fbReady');
       setFbReady(true);
     };
 
     if (window.FB) {
+      console.log('[FB] window.FB already present, initing immediately');
       initFB();
       return;
     }
 
+    console.log('[FB] window.FB not yet present, setting fbAsyncInit and injecting script');
     window.fbAsyncInit = initFB;
 
     if (!document.getElementById('facebook-jssdk')) {
@@ -84,7 +88,11 @@ const SignInForm = ({ onShowForgotPassword, onCallback }: SignFormProps): JSX.El
       script.src = 'https://connect.facebook.net/en_US/sdk.js';
       script.async = true;
       script.defer = true;
+      script.onerror = () => console.error('[FB] SDK script failed to load');
       document.body.appendChild(script);
+      console.log('[FB] script tag injected');
+    } else {
+      console.log('[FB] script tag already in DOM, waiting for fbAsyncInit callback');
     }
   }, []);
 
