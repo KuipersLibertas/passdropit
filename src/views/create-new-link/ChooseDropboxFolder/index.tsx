@@ -8,7 +8,9 @@ import ChooseFolder from '@/views/create-new-link/blocks/ChooseFolder';
 
 import {
   Box,
-  Typography
+  Typography,
+  Tabs,
+  Tab,
 } from '@mui/material';
 import { IChooseLink } from '@/types';
 
@@ -31,6 +33,10 @@ const ChooseDropboxFolder = (): JSX.Element => {
   return (
     <CommonLayout title="Create New Link">
       <Box maxWidth={900} mt="1rem" mx="auto">
+        <Tabs value={1} sx={{ mb: 2 }}>
+          <Tab label="Choose File" href="/create-new-link/file" component="a" />
+          <Tab label="Dropbox Folder Link" href="/create-new-link/dropbox-folder" component="a" />
+        </Tabs>
         {currentStep !== 3&&
           <Typography variant="h5" textAlign="center">
             Password Protect a Dropbox or Google Drive file
