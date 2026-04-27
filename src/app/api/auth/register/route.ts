@@ -19,6 +19,9 @@ export async function POST(request: Request) {
     if (password.length < 8) {
       return NextResponse.json({ success: false, message: 'Password must be at least 8 characters' }, { status: 400 });
     }
+    if (!/[A-Z]/.test(password) || !/[0-9]/.test(password)) {
+      return NextResponse.json({ success: false, message: 'Password must contain at least one uppercase letter and one number' }, { status: 400 });
+    }
 
     const result = await register(firstName, lastName, email, password);
     return NextResponse.json(result);

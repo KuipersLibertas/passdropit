@@ -27,6 +27,7 @@ const HelpLayout = ({ title, children }: HelpLayoutProps): JSX.Element => {
           <Typography
             fontWeight={700}
             variant="h4"
+            component="h1"
             color="common.white"
             display="inline-block"
             maxWidth="50rem"

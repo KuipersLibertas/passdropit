@@ -109,8 +109,8 @@ export async function GET(
         return NextResponse.json({ success: false, message: 'Unknown endpoint' }, { status: 404 });
     }
   } catch (error: any) {
-    console.error(`GET /api/gateway/${params.path} error:`, error.message);
-    return NextResponse.json({ success: false, message: error.message }, { status: 500 });
+    if (process.env.NODE_ENV !== 'production') console.error(`GET /api/gateway/${params.path} error:`, error.message);
+    return NextResponse.json({ success: false, message: 'An unexpected error occurred' }, { status: 500 });
   }
 }
 
@@ -172,8 +172,8 @@ export async function POST(
       const result = await userDb.uploadLogo(userId, buffer, file.type);
       return NextResponse.json(result);
     } catch (error: any) {
-      console.error('POST /api/gateway/upload-logo error:', error.message);
-      return NextResponse.json({ success: false, message: error.message }, { status: 500 });
+      if (process.env.NODE_ENV !== 'production') console.error('POST /api/gateway/upload-logo error:', error.message);
+      return NextResponse.json({ success: false, message: 'Upload failed' }, { status: 500 });
     }
   }
 
@@ -211,6 +211,9 @@ export async function POST(
       }
 
       case 'change-password': {
+        if (!rateLimit(`change-password:${userId}`, 5, 15 * 60)) {
+          return NextResponse.json({ success: false, message: 'Too many attempts. Please try again later.' }, { status: 429 });
+        }
         const result = await authDb.changePassword(userId, req.currentPassword, req.newPassword);
         return NextResponse.json(result);
       }
@@ -304,7 +307,7 @@ export async function POST(
         return NextResponse.json({ success: false, message: 'Unknown endpoint' }, { status: 404 });
     }
   } catch (error: any) {
-    console.error(`POST /api/gateway/${params.path} error:`, error.message);
-    return NextResponse.json({ success: false, message: error.message }, { status: 500 });
+    if (process.env.NODE_ENV !== 'production') console.error(`POST /api/gateway/${params.path} error:`, error.message);
+    return NextResponse.json({ success: false, message: 'An unexpected error occurred' }, { status: 500 });
   }
 }

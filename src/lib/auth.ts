@@ -3,6 +3,11 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import { login, facebookLogin } from '@/lib/db/auth';
 import { checkAndSyncProStatus } from '@/lib/db/user';
 
+const secret = process.env.NEXTAUTH_SECRET ?? '';
+if (secret.length < 32) {
+  throw new Error('NEXTAUTH_SECRET must be at least 32 characters. Generate one with: openssl rand -base64 32');
+}
+
 export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
@@ -29,7 +34,7 @@ export const authOptions: NextAuthOptions = {
             if (!response.success) return null;
             return response.user;
           } catch (error: any) {
-            console.log(error.message);
+            if (process.env.NODE_ENV !== 'production') console.error(error.message);
             return null;
           }
         }
@@ -40,7 +45,7 @@ export const authOptions: NextAuthOptions = {
         try {
           const response = await login(credentials.email, credentials.password);
           if (!response.success) {
-            console.log(response.message);
+            if (process.env.NODE_ENV !== 'production') console.error(response.message);
             return null;
           }
 
@@ -98,5 +103,5 @@ export const authOptions: NextAuthOptions = {
   session: {
     strategy: 'jwt',
   },
-  secret: process.env.NEXTAUTH_SECRET,
+  secret,
 };

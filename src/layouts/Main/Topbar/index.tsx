@@ -113,6 +113,7 @@ const Topbar = ({
               ? Images.DarkLogo
               : Images.LightLogo
           }
+          alt="Passdropit"
           height={1}
           width={1}
         />

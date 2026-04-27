@@ -1,31 +1,29 @@
-interface Window {
-  count: number;
-  resetAt: number;
-}
-
-const store = new Map<string, Window>();
-
-setInterval(() => {
-  const now = Date.now();
-  store.forEach((win, key) => {
-    if (now > win.resetAt) store.delete(key);
-  });
-}, 5 * 60 * 1000);
+import { supabase } from '@/lib/supabase';
 
 /**
+ * Supabase-backed rate limiter — works correctly across all serverless instances.
  * Returns true if the request is within the limit, false if it should be blocked.
+ *
+ * Requires the rate_limits table (see supabase/rate_limits.sql).
  */
-export function rateLimit(key: string, limit: number, windowSeconds: number): boolean {
-  const now = Date.now();
-  const entry = store.get(key);
+export async function rateLimit(key: string, limit: number, windowSeconds: number): Promise<boolean> {
+  const windowStart = new Date(Date.now() - windowSeconds * 1000).toISOString();
 
-  if (!entry || now > entry.resetAt) {
-    store.set(key, { count: 1, resetAt: now + windowSeconds * 1000 });
-    return true;
+  const { count } = await supabase
+    .from('rate_limits')
+    .select('*', { count: 'exact', head: true })
+    .eq('key', key)
+    .gte('created_at', windowStart);
+
+  if ((count ?? 0) >= limit) return false;
+
+  await supabase.from('rate_limits').insert({ key });
+
+  // Probabilistic cleanup — purge old rows ~1% of requests to avoid accumulation
+  if (Math.random() < 0.01) {
+    const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    await supabase.from('rate_limits').delete().lt('created_at', cutoff);
   }
 
-  if (entry.count >= limit) return false;
-
-  entry.count += 1;
   return true;
 }

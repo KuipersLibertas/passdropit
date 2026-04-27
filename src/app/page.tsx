@@ -2,8 +2,15 @@ import React from 'react';
 import Script from 'next/script';
 import Link from 'next/link';
 import MainLayout from '@/layouts/Main';
-
+import { Metadata } from 'next';
 import { default as HomeView } from '@/views/Home';
+
+const SITE_URL = process.env.NEXT_PUBLIC_PASSDROPIT_SITE_URL ?? 'https://passdropit.com';
+
+export const metadata: Metadata = {
+  alternates: { canonical: SITE_URL },
+  openGraph: { url: SITE_URL },
+};
 
 const Home = (): JSX.Element => {
   return (

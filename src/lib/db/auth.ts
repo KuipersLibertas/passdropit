@@ -38,12 +38,12 @@ export async function login(email: string, password: string) {
     .single();
 
   if (error || !user) {
-    return { success: false as const, message: 'User not found' };
+    return { success: false as const, message: 'Invalid email or password' };
   }
 
   const valid = await bcrypt.compare(password, user.password_hash);
   if (!valid) {
-    return { success: false as const, message: 'Invalid password' };
+    return { success: false as const, message: 'Invalid email or password' };
   }
 
   return { success: true as const, user: formatUser(user) };
@@ -163,7 +163,9 @@ export async function resetPassword(token: string, newPassword: string) {
 
   const password_hash = await bcrypt.hash(newPassword, 10);
   await supabase.from('users').update({ password_hash }).eq('id', tokenRow.user_id);
-  await supabase.from('password_reset_tokens').delete().eq('id', tokenRow.id);
+  // Delete all tokens for this user (not just the used one) and any expired tokens globally
+  await supabase.from('password_reset_tokens').delete().eq('user_id', tokenRow.user_id);
+  await supabase.from('password_reset_tokens').delete().lt('expires_at', new Date().toISOString());
 
   return { success: true as const, message: 'Password updated successfully' };
 }

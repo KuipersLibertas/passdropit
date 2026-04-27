@@ -139,8 +139,15 @@ export async function cancelPro(userId: number) {
   return { success: true as const, user: user ? formatUser(user) : null };
 }
 
+const SAFE_MIME_EXT: Record<string, string> = {
+  'image/jpeg': 'jpg',
+  'image/png':  'png',
+  'image/gif':  'gif',
+  'image/webp': 'webp',
+};
+
 export async function uploadLogo(userId: number, fileBuffer: Buffer, mimeType: string) {
-  const ext = mimeType.split('/')[1] ?? 'png';
+  const ext = SAFE_MIME_EXT[mimeType] ?? 'png';
   const storagePath = `${userId}/logo.${ext}`;
 
   const { error } = await supabase.storage

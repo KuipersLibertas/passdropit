@@ -1,4 +1,5 @@
 import React from 'react';
+import NextImage from 'next/image';
 import Container from '@/components/Container';
 import { Typography, Box, Link, Grid, Divider } from '@mui/material';
 import { Images } from '@/utils/assets';
@@ -79,11 +80,12 @@ const Footer = (): JSX.Element => {
           {/* Brand column */}
           <Grid item xs={12} md={4}>
             <Box mb={2}>
-              <Box
-                component="img"
+              <NextImage
                 src={Images.DarkLogo}
                 alt="Passdropit"
-                sx={{ display: 'block', height: { xs: 36, md: 42 }, width: 'auto' }}
+                width={180}
+                height={42}
+                style={{ height: 'auto', maxHeight: 42 }}
               />
             </Box>
             <Typography variant="body2" sx={{ color: '#475569', maxWidth: 260, lineHeight: 1.65 }}>

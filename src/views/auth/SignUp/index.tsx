@@ -50,11 +50,13 @@ const validationSchema = yup.object({
   password: yup
     .string()
     .required('Please enter your password')
-    .min(8, 'The password should have at minimum length of 8'),
+    .min(8, 'Password must be at least 8 characters')
+    .matches(/[A-Z]/, 'Password must contain at least one uppercase letter')
+    .matches(/[0-9]/, 'Password must contain at least one number'),
   confirmPassword: yup
     .string()
-    .required('Please enter your password')
-    .min(8, 'The password should have at minimum length of 8')
+    .required('Please confirm your password')
+    .min(8, 'Password must be at least 8 characters')
 });
 
 const SignUp = (): JSX.Element => {

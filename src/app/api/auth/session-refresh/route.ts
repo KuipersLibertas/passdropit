@@ -23,12 +23,17 @@ export async function GET(request: Request) {
   const sync        = searchParams.get('sync') === '1';
   const rawCallback = searchParams.get('callbackUrl') ?? '/user/plan';
 
-  // SECURITY: reject absolute URLs to prevent open redirect
-  const isSafeRedirect =
-    rawCallback.startsWith('/') &&
-    !rawCallback.startsWith('//') &&
-    !rawCallback.includes(':');
-  const callbackPath = isSafeRedirect ? rawCallback : '/user/plan';
+  // SECURITY: only allow relative paths — parse with URL constructor to catch
+  // encoded bypasses like %2F%2F, then verify the host matches our own origin.
+  let callbackPath = '/user/plan';
+  try {
+    const parsed = new URL(rawCallback, request.url);
+    if (parsed.origin === new URL(request.url).origin) {
+      callbackPath = parsed.pathname + parsed.search;
+    }
+  } catch {
+    // malformed URL — fall back to default
+  }
 
   const target = new URL(callbackPath, request.url);
 

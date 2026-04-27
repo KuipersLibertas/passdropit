@@ -4,9 +4,9 @@ const ALGO   = 'aes-256-gcm';
 const PREFIX = 'enc:';
 
 function getKey(): Buffer {
-  const secret = process.env.NEXTAUTH_SECRET;
-  if (!secret) throw new Error('NEXTAUTH_SECRET must be set to encrypt link passwords');
-  return crypto.createHash('sha256').update(secret).digest();
+  const key = process.env.LINK_ENCRYPTION_KEY ?? process.env.NEXTAUTH_SECRET;
+  if (!key) throw new Error('LINK_ENCRYPTION_KEY (or NEXTAUTH_SECRET) must be set to encrypt link passwords');
+  return crypto.createHash('sha256').update(key).digest();
 }
 
 export function encryptLinkPassword(plaintext: string): string {

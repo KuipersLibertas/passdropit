@@ -2,6 +2,7 @@
 
 import React from 'react';
 import HelpLayout from '@/views/shared/layouts/HelpLayout';
+import Image from 'next/image';
 
 import { Box, IconButton, Link, Typography } from '@mui/material';
 import { Images } from '@/utils/assets';
@@ -30,16 +31,16 @@ const AboutUs = (): JSX.Element => {
         <Link href="mailto:support@passdropit.com">support@passdropit.com</Link>
       </Box>
       <Box mt={2}>
-        <Box
-          component="img"
+        <Image
+          src={Images.OwnerPhoto}
+          alt="Robin Kuipers, founder of Passdropit"
           width={250}
           height={250}
-          borderRadius="100%"
-          src={Images.OwnerPhoto}
+          style={{ borderRadius: '100%' }}
         />
       </Box>
       <Box mt={1}>
-        <Typography variant="h6" fontWeight={500}>Robin Kuipers</Typography>
+        <Typography variant="h6" component="p" fontWeight={500}>Robin Kuipers</Typography>
       </Box>
       <Box mt={2}>
         <Typography variant="subtitle1">Linkedin </Typography>

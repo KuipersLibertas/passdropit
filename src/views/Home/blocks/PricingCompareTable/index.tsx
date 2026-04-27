@@ -111,6 +111,7 @@ const PricingCompareTable = (): JSX.Element => {
           <Typography
             fontWeight={700}
             variant="h4"
+            component="h2"
             textAlign="center"
             data-aos="fade-up"
             data-aos-offset={100}
@@ -122,6 +123,7 @@ const PricingCompareTable = (): JSX.Element => {
             <Typography
               fontWeight={300}
               variant="h6"
+              component="p"
               marginTop="0.875rem"
               textAlign="center"
               color="text.secondary"

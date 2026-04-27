@@ -4,6 +4,10 @@
  * Usage:
  *   SUPABASE_URL=https://... SUPABASE_SERVICE_ROLE_KEY=... node migrate.mjs
  *
+ * Optional env vars:
+ *   OLD_SITE_URL  — base URL of the old server for logo downloads
+ *                   (default: https://passdropit.com)
+ *
  * CSV files expected in the same directory as this script:
  *   users.csv, file_list_user.csv, daily_downloads.csv, ip_tracker.csv
  *
@@ -20,6 +24,7 @@ import fs from 'fs';
 // ─── CONFIG ────────────────────────────────────────────────────────────────
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const OLD_SITE_URL = (process.env.OLD_SITE_URL ?? 'https://passdropit.com').replace(/\/$/, '');
 
 if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
   console.error('❌  Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY env vars before running.');
@@ -206,7 +211,7 @@ async function migrateUsers() {
 
   let inserted = 0;
   for (let i = 0; i < mapped.length; i += 500) {
-    inserted += await batchUpsert('users', mapped.slice(i, i + 500));
+    inserted += await batchUpsert('users', mapped.slice(i, i + 500), 'user_email');
     process.stdout.write(`   ${inserted}/${mapped.length} users...\r`);
   }
   console.log(`\n✅  ${inserted} users`);
@@ -349,6 +354,71 @@ async function migrateDailyDownloads() {
   console.log(`\n✅  ${total} daily_downloads rows (${skipped} skipped — orphaned FK)`);
 }
 
+// ─── LOGO MIGRATION ────────────────────────────────────────────────────────
+
+/**
+ * Downloads logos from the old server for the 4 active users who had one,
+ * uploads each to Supabase Storage (bucket: logos, path: {userId}/logo.png),
+ * and updates the users.logo column with the resulting public URL.
+ *
+ * The list below was determined by cross-referencing users.csv and
+ * file_list_user.csv: only users with link activity in the last 6 months
+ * and a real logo file are included.
+ */
+const LOGO_USERS = [
+  { userId: 6128,  oldPath: 'uploads/passdropit/6128.png' },
+  { userId: 6907,  oldPath: 'uploads/passdropit/6907.png' },
+  { userId: 7328,  oldPath: 'uploads/passdropit/7328.png' },
+  { userId: 33762, oldPath: 'uploads/passdropit/33762.png' },
+];
+
+async function migrateLogos() {
+  console.log('\n🖼️   Migrating user logos...');
+
+  for (const { userId, oldPath } of LOGO_USERS) {
+    process.stdout.write(`   Processing user ${userId} ... `);
+
+    const localPath = path.join(__dirname, `logo_${userId}.png`);
+    if (!fs.existsSync(localPath)) {
+      console.log(`❌  File not found: ${localPath} — skipping user ${userId}`);
+      continue;
+    }
+
+    const imageBuffer = fs.readFileSync(localPath);
+    const contentType = 'image/png';
+    console.log(`${imageBuffer.length} bytes (local file)`);
+
+    const ext = contentType.split('/')[1]?.split(';')[0] ?? 'png';
+    const storagePath = `${userId}/logo.${ext}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('logos')
+      .upload(storagePath, imageBuffer, { contentType, upsert: true });
+
+    if (uploadError) {
+      console.error(`   ❌  Storage upload failed for user ${userId}:`, uploadError.message);
+      continue;
+    }
+
+    const { data: urlData } = supabase.storage.from('logos').getPublicUrl(storagePath);
+    const publicUrl = urlData.publicUrl;
+
+    const { error: updateError } = await supabase
+      .from('users')
+      .update({ logo: publicUrl })
+      .eq('id', userId);
+
+    if (updateError) {
+      console.error(`   ❌  DB update failed for user ${userId}:`, updateError.message);
+      continue;
+    }
+
+    console.log(`   ✅  User ${userId} → ${publicUrl}`);
+  }
+
+  console.log('\n✅  Logo migration complete');
+}
+
 // ─── MAIN ──────────────────────────────────────────────────────────────────
 
 async function main() {
@@ -356,11 +426,12 @@ async function main() {
   console.log(`    Supabase: ${SUPABASE_URL}\n`);
 
   try {
-    await migrateUsers();
-    await migrateLinks();
+    // await migrateUsers();
+    // await migrateLinks();
     // ip_tracker already complete — comment back in if re-running from scratch
     // await migrateIpTracker();
-    await migrateDailyDownloads();
+    // await migrateDailyDownloads();
+    await migrateLogos();
 
     console.log('\n🎉  Migration complete!');
     console.log('\n⚠️  Run these in the Supabase SQL Editor to fix auto-increment sequences:');
