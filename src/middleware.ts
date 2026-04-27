@@ -7,7 +7,7 @@ export default withAuth(
     const token = req.nextauth.token;
 
     // Admin-only routes
-    if (pathname.startsWith('/admin') && token?.user?.level !== 2) {
+    if (pathname.startsWith('/admin') && (token as any)?.user?.level !== 2) {
       return NextResponse.redirect(new URL('/', req.url));
     }
 
@@ -19,7 +19,7 @@ export default withAuth(
         const { pathname } = req.nextUrl;
 
         // Admin routes always require auth
-        if (pathname.startsWith('/admin')) return !!token;
+        if (pathname.startsWith('/admin')) return !!(token as any)?.user;
 
         // Authenticated user routes
         const authRequired = [
