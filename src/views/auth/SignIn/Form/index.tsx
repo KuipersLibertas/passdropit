@@ -62,7 +62,7 @@ const SignInForm = ({ onShowForgotPassword, onCallback }: SignFormProps): JSX.El
     if (!appId) return;
 
     const initFB = () => {
-      window.FB.init({ appId, cookie: true, xfbml: false, version: 'v19.0' });
+      window.FB.init({ appId, cookie: true, xfbml: false, version: 'v21.0' });
       setFbReady(true);
     };
 
