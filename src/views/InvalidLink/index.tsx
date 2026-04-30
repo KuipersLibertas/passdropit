@@ -81,7 +81,8 @@ const InvalidLink = (): JSX.Element => {
           </Grid>
         </Grid>
       </Container>
-      <ins 
+      <Script src="https://stpd.cloud/assets/stpdwrapper.js" async />
+      <ins
         className="stpdwrapper"
         style={{
           display: 'inline-block',
