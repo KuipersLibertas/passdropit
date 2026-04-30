@@ -92,6 +92,8 @@ const MainLayout = ({
   return (
     <Box>
       
+      <Script src="https://cmp.setupcmp.com/cmp/cmp/cmp-stub.js" data-prop-id="6396" />
+      <Script src="https://cmp.setupcmp.com/cmp/cmp/cmp-v1.js" data-prop-stpd-cmp-id="6396" async />
       <Script src="https://securepubads.g.doubleclick.net/tag/js/gpt.js" async />
       <Script 
         dangerouslySetInnerHTML={{
