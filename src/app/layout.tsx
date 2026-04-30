@@ -75,6 +75,8 @@ export default function RootLayout({
     <Providers>
       <html lang="en">
         <head>
+          <script src="https://cmp.setupcmp.com/cmp/cmp/cmp-stub.js" data-prop-id="6396" />
+          <script src="https://cmp.setupcmp.com/cmp/cmp/cmp-v1.js" data-prop-stpd-cmp-id="6396" async />
           <script
             type="application/ld+json"
             dangerouslySetInnerHTML={{
