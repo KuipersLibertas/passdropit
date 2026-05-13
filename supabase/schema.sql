@@ -106,3 +106,19 @@ CREATE INDEX IF NOT EXISTS idx_paid_links_link_id        ON paid_links(link_id);
 -- Storage: create a 'logos' bucket for user profile images
 -- Run this separately if needed:
 -- INSERT INTO storage.buckets (id, name, public) VALUES ('logos', 'logos', true);
+
+-- Explicit grants for service_role (required from October 2026 on all Supabase projects).
+-- These match the grants Supabase currently applies automatically; making them explicit
+-- future-proofs the schema against the upcoming default-grant removal.
+GRANT USAGE ON SCHEMA public TO service_role;
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.users               TO service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.file_list_user      TO service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.daily_downloads     TO service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.ip_tracker          TO service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.paid_links          TO service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.paid_membership     TO service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.password_reset_tokens TO service_role;
+
+-- Sequences (needed for INSERT with BIGSERIAL columns)
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO service_role;
