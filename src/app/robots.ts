@@ -17,6 +17,7 @@ export default function robots(): MetadataRoute.Robots {
         '/prosignup',
         '/reset-password/',
         '/invalid-link',
+        '/download/',
         '/404',
       ],
     },

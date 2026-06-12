@@ -1,5 +1,7 @@
 import React from 'react';
 
+export const revalidate = 300;
+
 import DownloadView from '@/views/Download';
 import { redirect } from 'next/navigation';
 import { IServerLinkDetail } from '@/types';
