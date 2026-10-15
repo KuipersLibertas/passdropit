@@ -1,7 +1,9 @@
 import { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import { login, facebookLogin } from '@/lib/db/auth';
+import { login, facebookLogin, getUserById } from '@/lib/db/auth';
 import { checkAndSyncProStatus } from '@/lib/db/user';
+
+const PWD_CHECK_INTERVAL_MS = 5 * 60 * 1000; // re-check password_version every 5 minutes
 
 const secret = process.env.NEXTAUTH_SECRET ?? '';
 if (secret.length < 32) {
@@ -81,6 +83,7 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.sign_out = false;
         token.user = user;
+        token.pwdCheckAt = Date.now();
         return token;
       }
 
@@ -93,6 +96,25 @@ export const authOptions: NextAuthOptions = {
           token.sign_out = false;
           if (session?.user?.logo !== undefined) {
             token.user = { ...token.user, logo: session.user.logo };
+          }
+        }
+        return token;
+      }
+
+      // Periodically verify that the session's password_version still matches the
+      // database. If the user changed their password from another device, the DB
+      // version will be higher than what is stored in this JWT, and we sign out.
+      if (!token.sign_out && token.user?.id) {
+        const now = Date.now();
+        if (!token.pwdCheckAt || now - token.pwdCheckAt > PWD_CHECK_INTERVAL_MS) {
+          token.pwdCheckAt = now;
+          try {
+            const dbUser = await getUserById(token.user.id);
+            if (!dbUser || (dbUser.password_version ?? 1) !== (token.user.password_version ?? 1)) {
+              token.sign_out = true;
+            }
+          } catch {
+            // DB unreachable — let the session continue rather than locking everyone out
           }
         }
       }
