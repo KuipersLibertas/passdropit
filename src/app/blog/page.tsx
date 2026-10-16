@@ -2,7 +2,7 @@ import React from 'react';
 import MainLayout from '@/layouts/Main';
 import { Metadata } from 'next';
 import { default as BlogOverviewView } from '@/views/Blog';
-import { IPost } from '@/types';
+import posts from '@/lib/blog/posts';
 
 const SITE_URL = process.env.NEXT_PUBLIC_PASSDROPIT_SITE_URL ?? 'https://passdropit.com';
 
@@ -17,22 +17,10 @@ export const metadata: Metadata = {
   },
 };
 
-const BlogOverview = async (): Promise<JSX.Element> => {
-  let postList: IPost[] = [];
-  try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_GHOST_SITE_URL}/ghost/api/content/posts/?key=${process.env.NEXT_PUBLIC_GHOST_API_KEY}&include=tags,authors&filter=tag:Passdropit`,
-      { method: 'GET', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' } }
-    );
-    const json = await response.json();
-    postList = json.posts ?? [];
-  } catch {
-    // Ghost unavailable — render empty list
-  }
-
+const BlogOverview = (): JSX.Element => {
   return (
     <MainLayout>
-      <BlogOverviewView postList={postList} />
+      <BlogOverviewView postList={posts} />
     </MainLayout>
   );
 };

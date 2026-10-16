@@ -4,40 +4,20 @@ import { default as BlogDetailView } from '@/views/Blog/Detail';
 import { redirect } from 'next/navigation';
 import { IPost } from '@/types';
 import { Metadata } from 'next';
+import posts from '@/lib/blog/posts';
 
 const SITE_URL = process.env.NEXT_PUBLIC_PASSDROPIT_SITE_URL ?? 'https://passdropit.com';
 
-async function getPost(id: string): Promise<IPost | null> {
-  try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_GHOST_SITE_URL}/ghost/api/content/posts/slug/${id}/?key=${process.env.NEXT_PUBLIC_GHOST_API_KEY}&include=tags,authors`,
-      { headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' } }
-    );
-    const json = await response.json();
-    if (!json.posts?.length) redirect('/');
-    return json.posts[0];
-  } catch {
-    return null;
-  }
+function getPost(id: string): IPost | null {
+  return posts.find((p) => p.slug === id) ?? null;
 }
 
-export async function generateStaticParams() {
-  const ghostUrl = process.env.NEXT_PUBLIC_GHOST_SITE_URL;
-  const ghostKey = process.env.NEXT_PUBLIC_GHOST_API_KEY;
-  if (!ghostUrl || !ghostKey) return [];
-  try {
-    const res = await fetch(
-      `${ghostUrl}/ghost/api/content/posts/?key=${ghostKey}&fields=slug&limit=all`
-    );
-    const json = await res.json();
-    return (json.posts ?? []).map((p: { slug: string }) => ({ id: p.slug }));
-  } catch {
-    return [];
-  }
+export function generateStaticParams() {
+  return posts.map((p) => ({ id: p.slug }));
 }
 
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
-  const post = await getPost(params.id);
+export function generateMetadata({ params }: { params: { id: string } }): Metadata {
+  const post = getPost(params.id);
   const title = post?.title ? `${post.title}` : 'Blog';
   const description = post?.custom_excerpt ?? '';
   const canonical = `${SITE_URL}/blog/${post?.slug ?? params.id}`;
@@ -63,9 +43,9 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
   };
 }
 
-const BlogDetail = async ({ params }: { params: { id: string } }): Promise<JSX.Element> => {
+const BlogDetail = ({ params }: { params: { id: string } }): JSX.Element => {
   if (!params.id) redirect('/');
-  const post = await getPost(params.id);
+  const post = getPost(params.id);
   const canonical = `${SITE_URL}/blog/${post?.slug ?? params.id}`;
 
   const articleSchema = post ? {
