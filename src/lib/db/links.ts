@@ -321,9 +321,7 @@ export async function validateLink(linkId: number, password: string, ipAddress: 
 
   if (link.track_ip && ipAddress) {
     try {
-      const geoRes = await fetch(
-        `https://api.ipstack.com/${ipAddress}?access_key=${process.env.IP_TRACK_KEY}&fields=city,country_name,latitude,longitude`
-      );
+      const geoRes = await fetch(`https://ipapi.co/${ipAddress}/json/`);
       const geo = await geoRes.json();
       city    = geo.city ?? '';
       country = geo.country_name ?? '';
