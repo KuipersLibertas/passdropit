@@ -7,6 +7,8 @@
 ## Developer Tasks
 
 ### High Priority
+- [ ] Fix social share URL bug in `src/views/Blog/Detail/index.tsx` lines 45, 51 — `/blog/detail/[slug]` should be `/blog/[slug]`; currently points to 404 on every blog post share (found in SEO audit W42)
+- [ ] Add descriptive `alt` text to all 7 blog post `feature_image_alt` fields in `src/lib/blog/posts.ts` — currently all empty, hurting image SEO and accessibility
 - [ ] Remove dead Universal Analytics (UA) snippet from `src/layouts/Main/index.tsx` (lines ~173–185) — UA sunset July 2023, dead network requests on every page load
 - [ ] Delete `public/robots.txt` (static file conflicts with dynamic `src/app/robots.ts`)
 - [ ] Delete stale `public/sitemap.xml` (references www.passdropit.com, no blog posts — dynamic `src/app/sitemap.ts` is correct)
@@ -34,6 +36,8 @@
 - [ ] "Google Drive vs Dropbox for sharing files with clients" — keyword: `google drive vs dropbox file sharing`
 - [ ] "How to set a download limit on a Dropbox link" — keyword: `dropbox download limit`
 - [ ] "How to password protect a Google Drive folder" — keyword: `password protect google drive folder`
+- [ ] "How to set an expiry date on a Dropbox link (for free)" — keyword: `dropbox link expiry date free`, `expire dropbox link automatically` — Dropbox charges for this; Passdropit offers it free (added W42)
+- [ ] "How to prevent your Dropbox link from being shared beyond your audience" — keyword: `restrict dropbox link access`, `how to prevent dropbox link sharing` — high-intent, no dominant content (added W42)
 
 ### Published
 - how-to-share-and-protect-a-dropbox-link

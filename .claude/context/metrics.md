@@ -1,20 +1,21 @@
 # Passdropit — Live Metrics
 
-*Updated weekly by Analytics Agent. Last manual update: 2026-10-18.*
+*Updated weekly by Analytics Agent. Last agent run: 2026-10-18 (W42). Live data pulled via Chrome automation.*
 
 ## Latest Weekly Snapshot
-*(To be filled by Analytics Agent on first run)*
+*Updated by Analytics Agent — 2026-W42 (2026-10-12 to 2026-10-18). Live data from GA4 G-6ZR1JRBKNW and Stripe.*
 
 | Metric | Value | Week |
 |--------|-------|------|
-| Total Users (7d) | — | — |
-| New Users (7d) | — | — |
-| Sessions (7d) | — | — |
-| Form starts (7d) | — | — |
-| Download events (7d) | — | — |
-| Stripe MRR | ~$19 | Oct 2026 |
-| Active subscriptions | 3 | Oct 2026 |
-| Ad revenue (7d) | — | — |
+| Total Users (7d) | 2,061 | 2026-W42 |
+| New Users (7d) | 1,964 | 2026-W42 |
+| Sessions (7d) | 2,254 | 2026-W42 |
+| Page Views (7d) | 3,908 | 2026-W42 |
+| Form starts (7d) | 1,170 | 2026-W42 |
+| Download events (7d) | 11 ⚠️ (GA4 only; likely tracking gap — verify vs DB) | 2026-W42 |
+| Stripe MRR | €16.91 (~$18.60 USD) | Oct 2026 (live) |
+| Active subscriptions | 3 | Oct 2026 (live) |
+| Ad revenue (7d) | ~$2 est. | 2026-W42 (Setupad, not in GA4) |
 
 ## Baseline Metrics (Aug–Oct 2026)
 - MAU: ~10,100
