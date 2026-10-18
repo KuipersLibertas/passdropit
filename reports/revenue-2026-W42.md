@@ -8,12 +8,12 @@
 
 | Source | This Week | Last Week | Change |
 |--------|-----------|-----------|--------|
-| Setupad | — (data gap; see note) | ~$0.35 est. | — |
+| Setupad | **$0.25** (~$0.21 confirmed + ~$0.04 Oct 18 est.) | $0.30 (W41 confirmed) | -17% |
 | AdSense (direct) | n/a (migrated to Setupad) | n/a | — |
 | Stripe MRR | $18.60 (€16.91) | $18.12 (€16.47) | +2.7% |
-| **Est. Total** | **~$18.95** | **~$18.47** | **+2.6%** |
+| **Total** | **~$18.85** | **~$18.42** | **+2.3%** |
 
-> **Setupad data gap:** The Setupad export (`setupad.xlsx`) covers through 2026-08-20. W42 actuals are unavailable. Estimate for week ending Oct 18: ~$0.35 based on Jul–Aug 2026 daily average ($0.051/day × 7).
+> **Setupad W42:** 6/7 days confirmed from export (`passdropitcom_setupad_daily_combined_2016-10-18_2026-10-17.xlsx`): $0.21 revenue, 609 impressions, avg eCPM $0.37. Oct 18 (today) not yet in export; estimated +$0.04 based on daily average.
 >
 > **Stripe context:** 3 active subs (2 × Pro $5 + 1 × Pro $9). No new subs or churns this week. MRR up €0.44 (+2.7%).
 
@@ -29,11 +29,12 @@
 | 2025 Q1 | $28–$39/mo | ~$8/wk |
 | 2025 Q4 | $10–$12/mo | ~$2.7/wk |
 | 2026 Jan–Apr | $9–$14/mo | ~$2.7/wk |
-| **2026 May** | **$2.28** | **$0.53** |
-| **2026 Jun** | **$1.86** | **$0.43** |
-| **2026 Jul** | **$1.57** | **$0.36** |
-| **2026 Aug** | **$1.01** | **$0.23** |
-| **2026 Sep–Oct** | — (est. ~$0.80) | **~$0.19** |
+| **2026 May** | **$2.27** ✓ | **$0.52** |
+| **2026 Jun** | **$1.85** ✓ | **$0.43** |
+| **2026 Jul** | **$1.55** ✓ | **$0.36** |
+| **2026 Aug** | **$1.49** ✓ | **$0.34** |
+| **2026 Sep** | **$1.22** ✓ | **$0.28** |
+| **2026 Oct** (partial, 1–17) | **$0.70** ✓ | **~$0.41/wk** |
 
 ⚠️ **CRITICAL:** Setupad revenue has collapsed 99%+ from the 2023 peak. Root cause is traffic volume collapse, not placement issues — ad requests fell from ~25K/day in 2023 to ~168/day in Aug 2026. The ~$2/week estimate in `context/metrics.md` is outdated by ~6× and must be corrected to ~$0.20–$0.35/week.
 
@@ -96,8 +97,8 @@ The eCPM has actually held up reasonably well in Aug 2026 (~$0.45 avg), suggesti
 
 ## Alerts
 
-- ⚠️ **Data gap:** Setupad spreadsheet ends 2026-08-20. W42 actuals unavailable. Future runs should pull a fresh export covering through report week.
-- ⚠️ **metrics.md outdated:** The `~$2/week` Setupad estimate in `context/metrics.md` overstates current revenue by ~6×.
+- ✅ **Data gap resolved:** Fresh Setupad exports added by user cover through 2026-10-17. W42 6/7 days confirmed ($0.21). Oct 18 (+~$0.04) is the only outstanding day.
+- ✅ **metrics.md corrected:** Setupad estimate updated from `~$2/week` (6× too high) to `~$0.25/week` based on confirmed actuals.
 - ✅ **ads.txt:** Present and comprehensive (514 lines, Setupad-managed), though 6 months stale.
 - ✅ **CMP:** Setupad consent management platform scripts present in `layout.tsx` (prop ID 6396) — GDPR/privacy compliant.
 - ✅ **No policy alerts detected** (from spreadsheet data — no flags through Aug 2026).
@@ -105,4 +106,4 @@ The eCPM has actually held up reasonably well in Aug 2026 (~$0.45 avg), suggesti
 ---
 
 *First run — no prior weekly report exists for comparison.*
-*Data sources: Setupad export (setupad.xlsx, through 2026-08-20), KPI W42 report, codebase audit.*
+*Data sources: Setupad exports (setupad.xlsx through 2026-08-20; passdropitcom_setupad_daily_combined_2016-10-18_2026-10-17.xlsx for confirmed W42 actuals), KPI W42 report, codebase audit.*
