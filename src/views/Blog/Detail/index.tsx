@@ -42,13 +42,13 @@ const BlogDetail = ({ post }: { post: IPost }): JSX.Element => {
           <Box marginLeft={0.5}>            
             <IconButton
               aria-label="Twitter"
-              href={`https://twitter.com/intent/tweet?text=${post.title}&url=${process.env.NEXT_PUBLIC_PASSDROPIT_SITE_URL}/blog/detail/${post.slug}`}
+              href={`https://twitter.com/intent/tweet?text=${post.title}&url=${process.env.NEXT_PUBLIC_PASSDROPIT_SITE_URL}/blog/${post.slug}`}
             >
               <TwitterIcon />
             </IconButton>
             <IconButton
               aria-label="Email"
-              href={`mailto:?subject=${post.title}&body=${process.env.NEXT_PUBLIC_PASSDROPIT_SITE_URL}/blog/detail/${post.slug}`}
+              href={`mailto:?subject=${post.title}&body=${process.env.NEXT_PUBLIC_PASSDROPIT_SITE_URL}/blog/${post.slug}`}
             >
               <EmailIcon />
             </IconButton>
