@@ -2,6 +2,7 @@
 
 import React from 'react';
 import moment from 'moment';
+import Script from 'next/script';
 import CommonLayout from '@/views/shared/layouts/CommonLayout';
 
 import {
@@ -22,6 +23,19 @@ const BlogDetail = ({ post }: { post: IPost }): JSX.Element => {
 
   return (
     <CommonLayout title={post?.title}>
+      <Script src="https://stpd.cloud/assets/stpdwrapper.js" async />
+      <ins
+        className="stpdwrapper"
+        style={{ display: 'inline-block', position: 'fixed', left: 0, top: 70 }}
+        data-tag-id="4218"
+      />
+      <Script dangerouslySetInnerHTML={{ __html: `(stpdwrapper = window.stpdwrapper || []).push({});` }} />
+      <ins
+        className="stpdwrapper"
+        style={{ display: 'inline-block', position: 'fixed', right: 0, top: 70 }}
+        data-tag-id="4219"
+      />
+      <Script dangerouslySetInnerHTML={{ __html: `(stpdwrapper = window.stpdwrapper || []).push({});` }} />
       <Box
         display="flex"
         alignItems="center"

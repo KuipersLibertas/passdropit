@@ -2,6 +2,7 @@
 
 import React from 'react';
 import moment from 'moment';
+import Script from 'next/script';
 import CommonLayout from '@/views/shared/layouts/CommonLayout';
 import {
   Box,
@@ -21,6 +22,19 @@ const BlogOverview = ({ postList }: { postList: IPost[] }): JSX.Element => {
 
   return (
     <CommonLayout title="Blog Posts">
+      <Script src="https://stpd.cloud/assets/stpdwrapper.js" async />
+      <ins
+        className="stpdwrapper"
+        style={{ display: 'inline-block', position: 'fixed', left: 0, top: 70 }}
+        data-tag-id="4218"
+      />
+      <Script dangerouslySetInnerHTML={{ __html: `(stpdwrapper = window.stpdwrapper || []).push({});` }} />
+      <ins
+        className="stpdwrapper"
+        style={{ display: 'inline-block', position: 'fixed', right: 0, top: 70 }}
+        data-tag-id="4219"
+      />
+      <Script dangerouslySetInnerHTML={{ __html: `(stpdwrapper = window.stpdwrapper || []).push({});` }} />
       <Grid container spacing={4} sx={{ pb: '3rem' }}>
         {postList.map((item, i) => (
           <Grid item xs={12} sm={6} md={4} lg={3} key={i} >
