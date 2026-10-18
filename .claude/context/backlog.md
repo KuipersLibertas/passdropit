@@ -59,6 +59,19 @@
 
 ---
 
+## Ad Optimization
+
+*(Added by Revenue Agent — W42, 2026-10-18)*
+
+### Queue
+- [ ] **Add Setupad ad slots to MainLayout** — Home page (558 views/wk) and blog pages have zero ad monetization. Add `stpdwrapper` slots to `src/layouts/Main/index.tsx`. Request new tag IDs from Setupad for these surfaces. Expected lift: +25–35% ad impressions at current traffic. *(Revenue Agent)*
+- [ ] **Refresh ads.txt** — Last generated 2026-04-29 via Setupad Ads.txt Manager. Regenerate via Setupad dashboard to include any new SSP partners added since April. *(Revenue Agent)*
+- [ ] **Correct metrics.md Setupad estimate** — `context/metrics.md` shows "~$2/week est." for Setupad; actual Aug 2026 data shows ~$0.23/week. Update to reflect reality. *(Revenue Agent)*
+- [ ] **Download fresh Setupad export** — Spreadsheet `setupad.xlsx` ends 2026-08-20; 2-month data gap. Export through Oct 2026 and drop in repo root. *(Revenue Agent)*
+- [ ] **Test above-card banner on download page** — A `stpdwrapper` slot above the password card at `/download/[slug]` could increase impressions on highest-traffic page. UX test needed to confirm it doesn't hurt password submission rate. *(Revenue Agent)*
+
+---
+
 ## Email Campaigns
 
 *(Added by Email Agent or user)*

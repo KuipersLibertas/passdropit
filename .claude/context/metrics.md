@@ -15,7 +15,7 @@
 | Download events (7d) | 11 ⚠️ (GA4 only; likely tracking gap — verify vs DB) | 2026-W42 |
 | Stripe MRR | €16.91 (~$18.60 USD) | Oct 2026 (live) |
 | Active subscriptions | 3 | Oct 2026 (live) |
-| Ad revenue (7d) | ~$2 est. | 2026-W42 (Setupad, not in GA4) |
+| Ad revenue (7d) | ~$0.25 est. | 2026-W42 (Setupad, Aug 2026 actuals show $0.23/wk) |
 
 ## Baseline Metrics (Aug–Oct 2026)
 - MAU: ~10,100
@@ -23,7 +23,7 @@
 - Registered users: 37,936
 - Protected links created: 111,410
 - Total download events (DB): 1,953,124
-- Current MRR: ~$21 (Stripe $19 + Setupad ~$2)
+- Current MRR: ~$19 (Stripe $19 + Setupad ~$0.25/wk — Aug 2026 actuals; peak was $200/mo in 2023)
 
 ## Traffic Channels (last 28 days, from Apr 2026 GA4)
 | Channel | New Users | % |
