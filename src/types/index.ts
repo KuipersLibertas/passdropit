@@ -122,7 +122,7 @@ export interface ILinkReport {
   passdrop_url: string;
   period_download_count: number;
   total_download_count: number;
-  is_pro: boolean;
+  is_pro: number;
   expiry_count: number;
   expiry_on: string;
 }

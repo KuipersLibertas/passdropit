@@ -115,7 +115,7 @@ export async function linkReport(period: string, userName?: string, url?: string
           total_download_count: 0,
           user_name: link.users.user_name,
           user_email: link.users.user_email,
-          is_pro: link.users.is_pro === 1,
+          is_pro: link.users.is_pro,
           expiry_count: link.expire_count,
           expiry_on: link.expires_on ?? '',
         };
