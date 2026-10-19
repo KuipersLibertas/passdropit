@@ -97,7 +97,7 @@ export async function linkReport(period: string, userName?: string, url?: string
     total_download_count: number;
     user_name: string;
     user_email: string;
-    is_pro: boolean;
+    is_pro: number;
     expiry_count: number;
     expiry_on: string;
   };
