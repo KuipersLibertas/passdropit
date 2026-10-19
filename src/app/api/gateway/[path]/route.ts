@@ -295,7 +295,7 @@ export async function POST(
 
       case 'link-report': {
         const result = await adminDb.linkReport(req.period, req.userName, req.url);
-        return NextResponse.json(result);
+        return NextResponse.json({ success: true, data: result });
       }
 
       case 'user-analytics': {
