@@ -299,8 +299,10 @@ export async function POST(
       }
 
       case 'user-analytics': {
-        const result = await adminDb.userAnalytics(req.userName, req.page, req.rowPerPage);
-        return NextResponse.json(result);
+        // Client sends 0-indexed pages (MUI DataTable); userAnalytics expects 1-indexed
+        const clientPage = req.page ?? 0;
+        const result = await adminDb.userAnalytics(req.userName, clientPage + 1, req.rowPerPage);
+        return NextResponse.json({ success: true, data: result.data, count: result.total, page: clientPage, rowPerPage: req.rowPerPage ?? 25 });
       }
 
       default:
