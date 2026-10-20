@@ -2,6 +2,42 @@ import type { IPost } from '@/types';
 
 const posts: IPost[] = [
   {
+    "id": "how-to-prevent-your-dropbox-link-from-being-shared",
+    "uuid": "how-to-prevent-your-dropbox-link-from-being-shared",
+    "slug": "how-to-prevent-your-dropbox-link-from-being-shared",
+    "title": "How to Prevent Your Dropbox Link From Being Shared Beyond Your Audience",
+    "html": "<article><p>You share a Dropbox link with your YouTube audience. A subscriber copies it and posts it in a public Discord server. Now thousands of people you've never heard of are downloading your file. You have no idea it's happening.</p><p>This is the default behavior of every Dropbox shared link. Once the link is out, you've lost control of who has it.</p><h2 id=\"what-dropbox-offers-natively\">What Dropbox offers natively</h2><p>Dropbox does have a sharing restriction — but it only works within a team. If you're on a paid Dropbox Business plan, you can set a link to \"team members only,\" so only people in your Dropbox organization can open it. That's useful for companies, but it doesn't help a solo creator sharing files with a public audience.</p><p>For free and individual paid accounts, there's no built-in way to prevent a link from being forwarded. Once someone has the URL, they can share it with anyone.</p><h2 id=\"password-protection\">Password protection: the practical solution</h2><p>The most direct way to restrict who can open a Dropbox link is to put a password on it. Anyone who visits the link without the password hits a wall. They can't access the file, and forwarding the URL to someone else doesn't help them either — the password requirement travels with the link.</p><p><a href=\"https://www.passdropit.com\">Passdropit</a> does exactly this. You connect your Dropbox file, set a password, and share a <code>passdropit.com/yourslug</code> link instead of the raw Dropbox URL. Only people with both the link and the password can get through.</p><p>Here's how to set it up:</p><ol><li>Create a free account at <a href=\"https://www.passdropit.com/register\">passdropit.com</a></li><li>Click <strong>Create New Link</strong> and select your Dropbox file</li><li>Set a password — something your intended audience will have, but random people won't</li><li>Share the Passdropit link and the password through your chosen channel (video, email list, community post)</li></ol><p>The password can be anything: a word from your video title, a phrase you mention at the end of a tutorial, or a code you send to paying members. Anyone who didn't get it through your channel can't get in.</p><h2 id=\"distribution-channels\">Controlling distribution by channel</h2><p>Password protection works best when the password is tied to a specific channel. A few examples:</p><ul><li><strong>YouTube members:</strong> Post the link publicly, share the password only in a members-only community post. Subscribers who aren't members can find the link but can't use it.</li><li><strong>Email list:</strong> Share both the link and password in your newsletter. Someone who finds the link elsewhere still needs to be on your list to have the password.</li><li><strong>Discord server:</strong> Share password in a locked channel. Keeping it out of public channels means only verified members can download.</li><li><strong>Paid course:</strong> Gate the password behind enrollment. Your course platform distributes the password; Passdropit enforces it on the file.</li></ul><h2 id=\"download-limits\">Download limits: a second layer</h2><p>Password protection stops unauthorized users. Download limits control scale — useful when you want to cap how many times a file gets downloaded regardless of who has the password.</p><p>Say you're releasing a free sample pack as an early-access drop for the first 500 people. You share the link and password publicly. Once 500 people have downloaded it, the link closes automatically. No manual monitoring required.</p><p>On Passdropit, you set a maximum download count alongside (or instead of) a password. When the limit is hit, the link stops working. This is a feature Dropbox doesn't offer at any plan level.</p><h2 id=\"revocation\">Revoking access entirely</h2><p>Sometimes you want to shut a link down completely — the promotion is over, the file was updated, or you found out it was being redistributed somewhere you didn't intend. With a raw Dropbox link, you'd have to delete the shared link in Dropbox settings, which could affect other people you legitimately shared it with.</p><p>With Passdropit, the Dropbox link stays untouched. You delete or disable the Passdropit link instead. Anyone who had the Passdropit URL — regardless of how they got it — can no longer access the file. The original Dropbox link isn't affected.</p><p>For tracking who opened your link in the first place, see our guide on <a href=\"/blog/get-notified-when-your-link-is-accessed\">getting notified when your Dropbox link is accessed</a>.</p><h2 id=\"practical-example\">A practical example</h2><p>You're a music producer releasing a free drum kit to your YouTube audience. You put the Passdropit link in the video description. In the video, you say the password is \"freekit2026.\"</p><p>A viewer screenshots the description and posts the link in a subreddit. Everyone there now has the URL — but not the password, because that was only in the video. They try the link, hit a password prompt, and move on.</p><p>Meanwhile, your actual viewers who watched the video get through without issue. You see 847 downloads in your Passdropit dashboard. You didn't have to do anything to stop the Reddit reshare — the password did it automatically.</p><h2 id=\"what-it-costs\">What it costs</h2><p>Password protection is available on Passdropit's free plan. Download limits and full analytics (location data, email notifications) require Pro at $5/month.</p><p>Dropbox's team-only link restriction requires a Business plan starting at $15/user/month — and it only works within a Dropbox organization, not for audience-facing file sharing.</p><p>Get started at <a href=\"https://www.passdropit.com\">passdropit.com</a>. If you also want to set an expiry date on your links, see <a href=\"/blog/how-to-set-an-expiry-date-on-a-dropbox-link\">how to set an expiry date on a Dropbox link</a>.</p></article>",
+    "comment_id": "",
+    "feature_image": "/assets/blog-prevent-dropbox-sharing.jpg",
+    "featured": false,
+    "visibility": "public",
+    "created_at": "2026-10-20T10:00:00.000Z",
+    "updated_at": "2026-10-20T10:00:00.000Z",
+    "published_at": "2026-10-20T10:00:00.000Z",
+    "custom_excerpt": "A Dropbox link can be copied and forwarded to anyone. Here's how to add a password gate so only your intended audience can open it — without touching your Dropbox settings.",
+    "feature_image_caption": "",
+    "feature_image_alt": "A glowing padlock icon on a dark background representing restricted link access",
+    "frontmatter": "",
+    "email_subject": "",
+    "meta_description": "A Dropbox link can be copied and forwarded to anyone. Here's how to add a password gate so only your intended audience can open it — without touching your Dropbox settings.",
+    "meta_title": "How to Prevent Your Dropbox Link From Being Shared Beyond Your Audience",
+    "twitter_description": "A Dropbox link can be forwarded to anyone. Here's how to gate it so only your intended audience can open it.",
+    "twitter_title": "How to Prevent Your Dropbox Link From Being Shared",
+    "twitter_image": "/assets/blog-prevent-dropbox-sharing.jpg",
+    "og_image": "/assets/blog-prevent-dropbox-sharing.jpg",
+    "og_title": "How to Prevent Your Dropbox Link From Being Shared Beyond Your Audience",
+    "og_description": "A Dropbox link can be copied and forwarded to anyone. Here's how to add a password gate so only your intended audience can open it — without touching your Dropbox settings.",
+    "comments": false,
+    "access": true,
+    "reading_time": 4,
+    "excerpt": "A Dropbox link can be copied and forwarded to anyone. Here's how to add a password gate so only your intended audience can open it — without touching your Dropbox settings.",
+    "url": "",
+    "canonical_url": "",
+    "primary_author": {
+      "name": "Robin"
+    }
+  },
+  {
     "id": "how-to-set-an-expiry-date-on-a-dropbox-link",
     "uuid": "how-to-set-an-expiry-date-on-a-dropbox-link",
     "slug": "how-to-set-an-expiry-date-on-a-dropbox-link",

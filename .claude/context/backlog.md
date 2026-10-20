@@ -56,6 +56,7 @@
 
 ### Queue
 - [ ] Music producer niche exploration — identify YouTube creators sharing sample packs via Dropbox
+- [ ] **Paid links feature — payment processor research** — Stripe doesn't support micro-payments (<$1); evaluate Lemon Squeezy, Paddle, PayPal as alternatives. Code nearly ready. Once resolved, unlocks new creator niches: sample pack sellers, Procreate brush creators, paid Notion templates (all Tier 1). Tabled Oct 2026 — revisit Nov 2026. *(Marketing Agent)*
 
 ---
 
