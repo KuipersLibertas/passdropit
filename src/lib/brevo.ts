@@ -5,7 +5,7 @@ export async function addContactToBrevo(email: string, name?: string): Promise<v
   if (!BREVO_API_KEY) return;
 
   try {
-    await fetch('https://api.brevo.com/v3/contacts', {
+    const res = await fetch('https://api.brevo.com/v3/contacts', {
       method: 'POST',
       headers: {
         'api-key': BREVO_API_KEY,
@@ -16,10 +16,14 @@ export async function addContactToBrevo(email: string, name?: string): Promise<v
         email,
         ...(name ? { attributes: { FIRSTNAME: name.split(' ')[0] } } : {}),
         listIds: [WELCOME_LIST_ID],
-        updateEnabled: false,
+        updateEnabled: true,
       }),
     });
-  } catch {
-    // Non-blocking — don't let Brevo failures break signup
+    if (!res.ok) {
+      const body = await res.text();
+      console.error(`[Brevo] ${res.status} for ${email}: ${body}`);
+    }
+  } catch (err) {
+    console.error('[Brevo] fetch failed:', err);
   }
 }
