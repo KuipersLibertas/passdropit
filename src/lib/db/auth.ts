@@ -2,6 +2,7 @@ import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import { supabase } from '@/lib/supabase';
 import { sendPasswordResetEmail } from '@/lib/email';
+import { addContactToBrevo } from '@/lib/brevo';
 
 type UserRow = {
   id: number;
@@ -78,6 +79,8 @@ export async function facebookLogin(name: string, email: string) {
     return { success: false as const, message: 'Registration failed' };
   }
 
+  void addContactToBrevo(normalizedEmail, name.trim());
+
   return { success: true as const, user: formatUser(newUser) };
 }
 
@@ -111,6 +114,8 @@ export async function register(
   if (error || !newUser) {
     return { success: false as const, message: 'Registration failed' };
   }
+
+  void addContactToBrevo(normalizedEmail, userName);
 
   return { success: true as const, user: formatUser(newUser) };
 }
