@@ -405,38 +405,19 @@ export async function buyLink(buyerUserId: number, linkId: number) {
     return { success: false as const, message: 'You have already purchased this link' };
   }
 
-  const { data: buyer } = await supabase
-    .from('users')
-    .select('id, balance')
-    .eq('id', buyerUserId)
-    .single();
+  // Atomic deduction via DB function — avoids the TOCTOU race where two
+  // concurrent requests both read the same balance and each pass the JS-level
+  // check, allowing a double-spend. Returns false if balance is insufficient.
+  const { data: deducted, error: deductError } = await supabase
+    .rpc('deduct_user_balance', { p_user_id: buyerUserId, p_amount: link.is_paid });
 
-  if (!buyer || buyer.balance < link.is_paid) {
-    return { success: false as const, message: 'Insufficient balance' };
-  }
-
-  const { error: deductError } = await supabase
-    .from('users')
-    .update({ balance: buyer.balance - link.is_paid })
-    .eq('id', buyerUserId)
-    .gte('balance', link.is_paid);
-
-  if (deductError) {
+  if (deductError || !deducted) {
     return { success: false as const, message: 'Purchase failed — please try again' };
   }
 
-  const { data: seller } = await supabase
-    .from('users')
-    .select('balance')
-    .eq('id', link.user_id)
-    .single();
-
-  if (seller) {
-    await supabase
-      .from('users')
-      .update({ balance: seller.balance + link.is_paid })
-      .eq('id', link.user_id);
-  }
+  // Atomic credit to seller (no read-modify-write; avoids concurrent credit loss).
+  await supabase
+    .rpc('credit_user_balance', { p_user_id: link.user_id, p_amount: link.is_paid });
 
   await supabase.from('paid_links').insert({
     user_id: buyerUserId,
