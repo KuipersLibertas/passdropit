@@ -76,6 +76,25 @@ export default function RootLayout({
     <Providers>
       <html lang="en">
         <head>
+          {/* Block adblock-detection scripts injected by the ad stack */}
+          <script dangerouslySetInnerHTML={{ __html: `
+            (function() {
+              var BLOCKED = ['copyrightcontent.org', 'sulvo.com'];
+              var obs = new MutationObserver(function(mutations) {
+                mutations.forEach(function(m) {
+                  m.addedNodes.forEach(function(node) {
+                    if (node.tagName === 'SCRIPT' && node.src) {
+                      var src = node.src.toLowerCase();
+                      if (BLOCKED.some(function(d) { return src.indexOf(d) !== -1; })) {
+                        node.parentNode && node.parentNode.removeChild(node);
+                      }
+                    }
+                  });
+                });
+              });
+              obs.observe(document.documentElement, { childList: true, subtree: true });
+            })();
+          ` }} />
           <script src="https://cmp.setupcmp.com/cmp/cmp/cmp-stub.js" data-prop-id="6396" />
           <script src="https://cmp.setupcmp.com/cmp/cmp/cmp-v1.js" data-prop-stpd-cmp-id="6396" async />
           {/* GPT — required for InArticleAdSlot and StickyAnchorAd */}
