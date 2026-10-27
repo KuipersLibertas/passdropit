@@ -91,13 +91,10 @@ export default function RootLayout({
                 googletag.defineSlot('/147246189,22860018223/passdropit.com_320x100_sticky_anchorad_mobile', [[320,100],[300,100],[320,50],[300,50]], 'passdropit_com_1000x100_sticky_anchorad_responsive').addService(googletag.pubads());
                 googletag.defineSlot('/147246189,22860018223/passdropit.com_336x336_in_article_mobile_1', [[300,250],[336,336],[336,320],[320,320],[300,300],[336,280],[320,250],[320,336]], 'passdropit_com_1140x280_in_article_responsive_1').addService(googletag.pubads());
               }
-              var interstitialSlot = googletag.defineOutOfPageSlot('/147246189,22860018223/passdropit.com_interstitial', googletag.enums.OutOfPageFormat.INTERSTITIAL);
-              if (interstitialSlot) interstitialSlot.addService(googletag.pubads());
               googletag.pubads().enableSingleRequest();
               googletag.pubads().disableInitialLoad();
               googletag.enableServices();
               googletag.pubads().collapseEmptyDivs();
-              googletag.display(interstitialSlot);
               googletag.display('passdropit_com_1000x100_sticky_anchorad_responsive');
               googletag.display('passdropit_com_1140x280_in_article_responsive_1');
             });
