@@ -1,7 +1,7 @@
 'use client';
-import Script from 'next/script';
 
 import React from 'react';
+import AdSlot from '@/components/AdSlot';
 import Container from '@/components/Container';
 
 import useMediaQuery from '@mui/material/useMediaQuery';
@@ -81,39 +81,8 @@ const InvalidLink = (): JSX.Element => {
           </Grid>
         </Grid>
       </Container>
-      <Script src="https://stpd.cloud/assets/stpdwrapper.js" async />
-      <ins
-        className="stpdwrapper"
-        style={{
-          display: 'inline-block',
-          position: 'fixed',
-          left: 0,
-          top:70
-        }}
-        data-tag-id="4218"></ins>
-      <Script
-        dangerouslySetInnerHTML={{
-          __html: `
-          (stpdwrapper = window.stpdwrapper || []).push({});
-          `
-        }}
-      />
-      <ins 
-        className="stpdwrapper"
-        style={{
-          display: 'inline-block',
-          position: 'fixed',
-          right: 0,
-          top:70
-        }}
-        data-tag-id="4219"></ins>
-      <Script 
-        dangerouslySetInnerHTML={{
-          __html: `
-          (stpdwrapper = window.stpdwrapper || []).push({});
-          `
-        }}
-      />
+      <AdSlot tagId="4218" slotId="invalidlink-left" style={{ position: 'fixed', left: 0, top: 70 }} />
+      <AdSlot tagId="4219" slotId="invalidlink-right" style={{ position: 'fixed', right: 0, top: 70 }} />
     </Box>
   );
 };

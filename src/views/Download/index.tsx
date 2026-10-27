@@ -1,8 +1,11 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
-import Script from 'next/script';
+import React, { useState, useCallback, useContext } from 'react';
+import { useSession } from 'next-auth/react';
+import AdSlot from '@/components/AdSlot';
 import ValidationCheckForm from '@/views/Download/blocks/ValidationCheckForm';
+import DownloadGateway from '@/views/Download/blocks/DownloadGateway';
+import ApplicationContext from '@/contexts/ApplicationContext';
 import SharedFiles from '@/views/Download/blocks/SharedFiles';
 import Footer from '@/layouts/Main/Footer';
 import { Box, Typography, Link } from '@mui/material';
@@ -14,12 +17,27 @@ import { ThemeMode, UserLevel } from '@/utils/constants';
 
 const Download = ({ linkInfo }: { linkInfo: IServerLinkDetail }): JSX.Element => {
   const theme = useTheme();
+  const { data: session } = useSession();
+  const { setShowUpgradePlan } = useContext(ApplicationContext);
   const [isValidated, setIsValidated] = useState<boolean>(linkInfo.ignoreValidate);
+  const [showGateway, setShowGateway] = useState<boolean>(false);
   const isLight = theme.palette.mode === ThemeMode.light;
+
+  const isPro = (session?.user?.level ?? UserLevel.Normal) >= UserLevel.Pro;
 
   const handleValidationResult = useCallback((result: boolean): void => {
     setIsValidated(result);
-  }, []);
+    if (!result) return;
+
+    // Show the download gateway once per session for free users only.
+    // Never show it for links that skip validation (ignoreValidate).
+    if (isPro) return;
+    try {
+      if (sessionStorage.getItem('__pdrop_gw')) return;
+      sessionStorage.setItem('__pdrop_gw', '1');
+    } catch { return; }
+    setShowGateway(true);
+  }, [isPro]);
 
   return (
     <Box
@@ -32,8 +50,13 @@ const Download = ({ linkInfo }: { linkInfo: IServerLinkDetail }): JSX.Element =>
           : 'linear-gradient(160deg, #0f172a 0%, #1e293b 50%, #0f172a 100%)',
       }}
     >
-      {/* Ad scripts */}
-      <Script src="https://stpd.cloud/assets/stpdwrapper.js" async />
+      {/* Gateway interstitial — shown once per session after password validation */}
+      {showGateway && (
+        <DownloadGateway
+          onComplete={() => setShowGateway(false)}
+          onUpgrade={() => { setShowGateway(false); setShowUpgradePlan(true); }}
+        />
+      )}
 
       {/* Decorative blobs */}
       <Box sx={{ position: 'fixed', top: '-5%', right: '-5%', width: 400, height: 400, borderRadius: '50%', background: `radial-gradient(circle, ${alpha(theme.palette.primary.main, isLight ? 0.08 : 0.1)} 0%, transparent 70%)`, pointerEvents: 'none', zIndex: 0 }} />
@@ -164,19 +187,9 @@ const Download = ({ linkInfo }: { linkInfo: IServerLinkDetail }): JSX.Element =>
         </Box>
       </Box>
 
-      {/* Sticky ad slots */}
-      <ins
-        className="stpdwrapper"
-        style={{ display: 'inline-block', position: 'fixed', left: 0, top: 70 }}
-        data-tag-id="4218"
-      />
-      <Script dangerouslySetInnerHTML={{ __html: `(stpdwrapper = window.stpdwrapper || []).push({});` }} />
-      <ins
-        className="stpdwrapper"
-        style={{ display: 'inline-block', position: 'fixed', right: 0, top: 70 }}
-        data-tag-id="4219"
-      />
-      <Script dangerouslySetInnerHTML={{ __html: `(stpdwrapper = window.stpdwrapper || []).push({});` }} />
+      {/* Sticky side rail ad slots */}
+      <AdSlot tagId="4218" slotId="download-left" style={{ position: 'fixed', left: 0, top: 70 }} />
+      <AdSlot tagId="4219" slotId="download-right" style={{ position: 'fixed', right: 0, top: 70 }} />
 
       {/* Footer */}
       <Box position="relative" zIndex={1}>

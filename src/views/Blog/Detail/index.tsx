@@ -2,8 +2,9 @@
 
 import React from 'react';
 import moment from 'moment';
-import Script from 'next/script';
 import CommonLayout from '@/views/shared/layouts/CommonLayout';
+import AdSlot from '@/components/AdSlot';
+import InArticleAdSlot from '@/components/InArticleAdSlot';
 
 import {
   Box,
@@ -23,19 +24,9 @@ const BlogDetail = ({ post }: { post: IPost }): JSX.Element => {
 
   return (
     <CommonLayout title={post?.title}>
-      <Script src="https://stpd.cloud/assets/stpdwrapper.js" async />
-      <ins
-        className="stpdwrapper"
-        style={{ display: 'inline-block', position: 'fixed', left: 0, top: 70 }}
-        data-tag-id="4218"
-      />
-      <Script dangerouslySetInnerHTML={{ __html: `(stpdwrapper = window.stpdwrapper || []).push({});` }} />
-      <ins
-        className="stpdwrapper"
-        style={{ display: 'inline-block', position: 'fixed', right: 0, top: 70 }}
-        data-tag-id="4219"
-      />
-      <Script dangerouslySetInnerHTML={{ __html: `(stpdwrapper = window.stpdwrapper || []).push({});` }} />
+      {/* Side rail ads */}
+      <AdSlot tagId="4218" slotId="blog-detail-left" style={{ position: 'fixed', left: 0, top: 70 }} />
+      <AdSlot tagId="4219" slotId="blog-detail-right" style={{ position: 'fixed', right: 0, top: 70 }} />
       <Box
         display="flex"
         alignItems="center"
@@ -72,6 +63,12 @@ const BlogDetail = ({ post }: { post: IPost }): JSX.Element => {
       <Box paddingY={4}>
         <Divider />
       </Box>
+
+      {/* In-article ad above post body — variant 1 (immediate, pre-defined by Setupad wrapper) */}
+      <Box sx={{ my: 2 }}>
+        <InArticleAdSlot variant={1} />
+      </Box>
+
       <Box
         sx={{
           maxWidth: '1200px',
@@ -103,7 +100,12 @@ const BlogDetail = ({ post }: { post: IPost }): JSX.Element => {
           }
         }}
         dangerouslySetInnerHTML={{ __html: post?.html }}
-      ></Box>
+      />
+
+      {/* In-article ad below post body — variant 2 (lazy, defined inline on viewport entry) */}
+      <Box sx={{ mt: 4 }}>
+        <InArticleAdSlot variant={2} />
+      </Box>
     </CommonLayout>
   );
 };

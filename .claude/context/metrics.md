@@ -1,21 +1,22 @@
 # Passdropit — Live Metrics
 
-*Updated weekly by Analytics Agent. Last agent run: 2026-10-18 (W42). Live data pulled via Chrome automation.*
+*Updated weekly by Analytics Agent. Last agent run: 2026-10-26 (W43). GA4 live via Chrome; Stripe/Supabase/Setupad not reachable.*
 
 ## Latest Weekly Snapshot
-*Updated by Analytics Agent — 2026-W42 (2026-10-12 to 2026-10-18). Live data from GA4 G-6ZR1JRBKNW and Stripe.*
+*Updated by Analytics Agent — 2026-W43 (2026-10-19 to 2026-10-25). GA4 live; Stripe/Supabase/Setupad unreachable this run (last known values carried).*
 
 | Metric | Value | Week |
 |--------|-------|------|
-| Total Users (7d) | 2,061 | 2026-W42 |
-| New Users (7d) | 1,964 | 2026-W42 |
-| Sessions (7d) | 2,254 | 2026-W42 |
-| Page Views (7d) | 3,908 | 2026-W42 |
-| Form starts (7d) | 1,170 | 2026-W42 |
-| Download events (7d) | 11 ⚠️ (GA4 only; likely tracking gap — verify vs DB) | 2026-W42 |
-| Stripe MRR | €16.91 (~$18.60 USD) | Oct 2026 (live) |
-| Active subscriptions | 3 | Oct 2026 (live) |
-| Ad revenue (7d) | ~$0.25 | 2026-W42 (Setupad confirmed: $0.21 for Oct 12-17 + est. Oct 18) |
+| Total Users (7d) | 2,069 | 2026-W43 |
+| New Users (7d) | 2,000 | 2026-W43 |
+| Sessions (7d) | 2,303 | 2026-W43 |
+| Page Views (7d) | 4,207 | 2026-W43 |
+| Form starts (7d) | 1,311 | 2026-W43 |
+| Download events (7d) | 42 ⚠️ (GA4 only; still a tracking gap, DB check blocked) | 2026-W43 |
+| Organic Search sessions (7d) | 14 (0.6%) 🔴 | 2026-W43 |
+| Stripe MRR | €16.91 (~$18.60 USD) — last known, Stripe logged out | 2026-W42 |
+| Active subscriptions | 3 — last known | 2026-W42 |
+| Ad revenue (7d) | ~$0.23 (estimate; Setupad not reachable) | 2026-W43 |
 
 ## Baseline Metrics (Aug–Oct 2026)
 - MAU: ~10,100
