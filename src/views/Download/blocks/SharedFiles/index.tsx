@@ -6,8 +6,8 @@ import ApplicationContext from '@/contexts/ApplicationContext';
 import {
   Box,
   IconButton,
+  Link,
   Typography,
-
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { CloudDownload as CloudDownloadIcon } from '@mui/icons-material';
@@ -76,13 +76,26 @@ const SharedFiles = ({ linkInfo }: { linkInfo: IServerLinkDetail }): JSX.Element
               borderBottom = {`1px solid ${theme.palette.common.gray}`}
               px={1}
             >
-              <Box flex={1}>
-                <Typography variant="subtitle1" color="primary.main">
-                  {file.name ? file.name : file.url}
-                </Typography>
+              <Box flex={1} minWidth={0}>
+                <Link
+                  href={file.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  underline="hover"
+                  variant="subtitle1"
+                  color="primary.main"
+                  sx={{
+                    display: 'block',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {file.name || file.url}
+                </Link>
               </Box>
-              <Box flex={1} display="flex" justifyContent="flex-end">
-                <IconButton href={file.url}>
+              <Box flexShrink={0} display="flex" justifyContent="flex-end">
+                <IconButton href={file.url} target="_blank" rel="noopener noreferrer">
                   <CloudDownloadIcon color="primary" />
                 </IconButton>
               </Box>
