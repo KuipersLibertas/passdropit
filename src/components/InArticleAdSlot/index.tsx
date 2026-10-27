@@ -78,11 +78,9 @@ export default function InArticleAdSlot({ variant }: Props) {
     window.googletag = window.googletag || { cmd: [] };
     const gt = window.googletag;
 
-    // Variant 1: slot pre-defined by layout.tsx GPT init; just call display
-    if (variant === 1) {
-      gt.cmd.push(() => gt.display(SLOT_1_ID));
-      return;
-    }
+    // Variant 1: slot pre-defined and display() already called by layout.tsx GPT init block.
+    // Setupad's wrapper handles refresh. Nothing to do here.
+    if (variant === 1) return;
 
     // Variants 2 and 3: lazy — fire when slot enters the viewport
     const el = document.getElementById(slotId);

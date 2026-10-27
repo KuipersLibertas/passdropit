@@ -98,6 +98,8 @@ export default function RootLayout({
               googletag.enableServices();
               googletag.pubads().collapseEmptyDivs();
               googletag.display(interstitialSlot);
+              googletag.display('passdropit_com_1000x100_sticky_anchorad_responsive');
+              googletag.display('passdropit_com_1140x280_in_article_responsive_1');
             });
           ` }} />
           {/* Setupad prebid wrapper — provides window.stpd.initializeAdUnit and header bidding */}
