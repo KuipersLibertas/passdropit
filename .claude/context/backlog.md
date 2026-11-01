@@ -43,6 +43,10 @@
 - [ ] "How to password protect a Google Drive folder" — keyword: `password protect google drive folder`
 - [ ] "Does Google Drive have password protection? (No — here's the workaround)" — keyword: `google drive password protection`; short definitional answer up top for featured snippet (added W44)
 
+- [ ] "How to stop your sample pack from being leaked on free-VST sites" — music production niche (added 2026-11)
+- [ ] "How to limit downloads on a Dropbox sample pack link" — music production niche (added 2026-11)
+- [ ] "Share a Procreate brush pack from Google Drive without it leaking" — Procreate niche (added 2026-11)
+
 ### Published
 - how-to-set-an-expiry-date-on-a-dropbox-link (2026-10-18)
 - how-to-prevent-your-dropbox-link-from-being-shared (2026-10-20)
