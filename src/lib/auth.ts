@@ -5,8 +5,9 @@ import { checkAndSyncProStatus } from '@/lib/db/user';
 
 const PWD_CHECK_INTERVAL_MS = 5 * 60 * 1000; // re-check password_version every 5 minutes
 
+// Validate at startup in server context only — not during next build static analysis
 const secret = process.env.NEXTAUTH_SECRET ?? '';
-if (secret.length < 32) {
+if (process.env.NEXT_PHASE !== 'phase-production-build' && secret.length < 32) {
   throw new Error('NEXTAUTH_SECRET must be at least 32 characters. Generate one with: openssl rand -base64 32');
 }
 
