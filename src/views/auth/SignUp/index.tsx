@@ -198,8 +198,7 @@ const SignUp = (): JSX.Element => {
             We sent a verification link to your email address. Click the link to activate your account.
           </Typography>
           <Typography mt={2} color="text.secondary" variant="body2">
-            Didn&apos;t get it? Check your spam folder or{' '}
-            <Link className="link" href="/signin">sign in</Link> to resend.
+            Didn&apos;t get it? Check your spam folder. If you still don&apos;t see it, try signing up again with the same email address.
           </Typography>
         </Box>
       </Container>
