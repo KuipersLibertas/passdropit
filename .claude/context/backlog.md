@@ -36,7 +36,6 @@
 *(Added by SEO Agent and Marketing Agent)*
 
 ### Queue (to assign to Content Agent)
-- [ ] "How to track who downloads your Lightroom presets" — keyword: `track dropbox downloads`
 - [ ] "How music producers can protect their sample packs" — new niche targeting
 - [ ] "Google Drive vs Dropbox for sharing files with clients" — keyword: `google drive vs dropbox file sharing`
 - [ ] "How to set a download limit on a Dropbox link" — keyword: `dropbox download limit`
@@ -48,6 +47,7 @@
 - [ ] "Share a Procreate brush pack from Google Drive without it leaking" — Procreate niche (added 2026-11)
 
 ### Published
+- how-to-track-who-downloads-your-lightroom-presets (2026-11-01) — keyword: `track dropbox downloads`; feature image added
 - how-to-set-an-expiry-date-on-a-dropbox-link (2026-10-18)
 - how-to-prevent-your-dropbox-link-from-being-shared (2026-10-20)
 - how-to-share-and-protect-a-dropbox-link
