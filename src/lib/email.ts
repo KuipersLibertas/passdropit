@@ -34,6 +34,24 @@ export async function sendPasswordResetEmail(
   });
 }
 
+export async function sendEmailVerificationEmail(
+  toEmail: string,
+  toName: string,
+  verifyUrl: string
+): Promise<void> {
+  await getResend().emails.send({
+    from: FROM(),
+    to: toEmail,
+    subject: 'Verify your Passdropit email address',
+    html: `
+      <p>Hi ${escHtml(toName)},</p>
+      <p>Thanks for signing up! Please verify your email address by clicking the link below:</p>
+      <p><a href="${escHtml(verifyUrl)}">${escHtml(verifyUrl)}</a></p>
+      <p>This link expires in 24 hours. If you did not create an account, you can safely ignore this email.</p>
+    `,
+  });
+}
+
 export async function sendLinkDownloadNotification(
   ownerEmail: string,
   ownerName: string,

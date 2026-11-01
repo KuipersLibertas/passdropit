@@ -2,6 +2,18 @@ import { NextResponse } from 'next/server';
 import { register } from '@/lib/db/auth';
 import { rateLimit } from '@/lib/rateLimit';
 
+async function verifyHcaptcha(token: string): Promise<boolean> {
+  const secret = process.env.HCAPTCHA_SECRET_KEY;
+  if (!secret) return true; // skip verification if not configured (dev)
+  const res = await fetch('https://api.hcaptcha.com/siteverify', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({ secret, response: token }),
+  });
+  const data = await res.json();
+  return data.success === true;
+}
+
 export async function POST(request: Request) {
   try {
     const xff = request.headers.get('x-forwarded-for');
@@ -10,7 +22,11 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, message: 'Too many registration attempts. Try again later.' }, { status: 429 });
     }
 
-    const { firstName, lastName, email, password } = await request.json();
+    const { firstName, lastName, email, password, hcaptchaToken } = await request.json();
+
+    if (!hcaptchaToken || !(await verifyHcaptcha(hcaptchaToken))) {
+      return NextResponse.json({ success: false, message: 'Captcha verification failed. Please try again.' }, { status: 400 });
+    }
 
     if (!firstName || !lastName || !email || !password) {
       return NextResponse.json({ success: false, message: 'All fields are required' }, { status: 400 });

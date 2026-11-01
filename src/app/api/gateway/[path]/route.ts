@@ -220,11 +220,17 @@ export async function POST(
 
       // ── Links ──────────────────────────────────────────────────────────────
       case 'save-link': {
+        if (!session?.user?.email_verified) {
+          return NextResponse.json({ success: false, message: 'Please verify your email address before creating links. Check your inbox for a verification email.' }, { status: 403 });
+        }
         const result = await linksDb.saveLink(userId, req as any);
         return NextResponse.json(result);
       }
 
       case 'update-link': {
+        if (!session?.user?.email_verified) {
+          return NextResponse.json({ success: false, message: 'Please verify your email address before updating links. Check your inbox for a verification email.' }, { status: 403 });
+        }
         const result = await linksDb.updateLink(userId, req as any);
         return NextResponse.json(result);
       }
