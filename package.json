@@ -68,6 +68,6 @@
     "eslint-plugin-unused-imports": "^3.0.0",
     "eslint-webpack-plugin": "^4.0.1",
     "prettier": "^3.0.3",
-    "typescript": "^5.9.3"
+    "typescript": "~5.3.3"
   }
 }
