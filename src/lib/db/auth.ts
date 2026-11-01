@@ -123,13 +123,21 @@ export async function register(
   const token = crypto.randomBytes(32).toString('hex');
   const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
   const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
-  await supabase.from('email_verification_tokens').insert({
+  const { error: tokenError } = await supabase.from('email_verification_tokens').insert({
     user_id: newUser.id,
     token_hash: tokenHash,
     expires_at: expiresAt,
   });
+  if (tokenError) {
+    console.error('[register] Failed to insert verification token:', tokenError.message);
+  }
+
   const siteUrl = process.env.NEXT_PUBLIC_PASSDROPIT_SITE_URL ?? 'https://passdropit.com';
-  void sendEmailVerificationEmail(normalizedEmail, userName, `${siteUrl}/verify-email?token=${encodeURIComponent(token)}`);
+  try {
+    await sendEmailVerificationEmail(normalizedEmail, userName, `${siteUrl}/verify-email?token=${encodeURIComponent(token)}`);
+  } catch (emailError: any) {
+    console.error('[register] Failed to send verification email:', emailError?.message ?? emailError);
+  }
 
   return { success: true as const, user: formatUser(newUser) };
 }
