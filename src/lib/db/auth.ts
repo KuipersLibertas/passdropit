@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import { supabase } from '@/lib/supabase';
-import { sendPasswordResetEmail } from '@/lib/email';
+import { sendPasswordResetEmail, sendEmailVerificationEmail } from '@/lib/email';
 import { addContactToBrevo } from '@/lib/brevo';
 
 type UserRow = {
@@ -16,6 +16,7 @@ type UserRow = {
   paypal_id: string | null;
   balance: number;
   logo: string | null;
+  email_verified: boolean;
 };
 
 export function formatUser(user: UserRow) {
@@ -30,6 +31,7 @@ export function formatUser(user: UserRow) {
     subscription_id: user.subscription_id ?? '',
     logo: user.logo ?? '',
     password_version: user.password_version ?? 1,
+    email_verified: user.email_verified ?? true,
   };
 }
 
@@ -71,7 +73,7 @@ export async function facebookLogin(name: string, email: string) {
 
   const { data: newUser, error } = await supabase
     .from('users')
-    .insert({ user_name: name.trim(), user_email: normalizedEmail, password_hash, is_pro: 0, balance: 0 })
+    .insert({ user_name: name.trim(), user_email: normalizedEmail, password_hash, is_pro: 0, balance: 0, email_verified: true })
     .select()
     .single();
 
@@ -117,7 +119,42 @@ export async function register(
 
   void addContactToBrevo(normalizedEmail, userName);
 
+  // Send verification email
+  const token = crypto.randomBytes(32).toString('hex');
+  const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
+  const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+  await supabase.from('email_verification_tokens').insert({
+    user_id: newUser.id,
+    token_hash: tokenHash,
+    expires_at: expiresAt,
+  });
+  const siteUrl = process.env.NEXT_PUBLIC_PASSDROPIT_SITE_URL ?? 'https://passdropit.com';
+  void sendEmailVerificationEmail(normalizedEmail, userName, `${siteUrl}/verify-email?token=${encodeURIComponent(token)}`);
+
   return { success: true as const, user: formatUser(newUser) };
+}
+
+export async function verifyEmail(token: string) {
+  const tokenHash = crypto.createHash('sha256').update(decodeURIComponent(token)).digest('hex');
+
+  const { data: tokenRow } = await supabase
+    .from('email_verification_tokens')
+    .select('id, user_id, expires_at')
+    .eq('token_hash', tokenHash)
+    .maybeSingle();
+
+  if (!tokenRow) {
+    return { success: false as const, message: 'Invalid or expired verification link' };
+  }
+
+  if (new Date(tokenRow.expires_at) < new Date()) {
+    return { success: false as const, message: 'Verification link has expired' };
+  }
+
+  await supabase.from('users').update({ email_verified: true }).eq('id', tokenRow.user_id);
+  await supabase.from('email_verification_tokens').delete().eq('user_id', tokenRow.user_id);
+
+  return { success: true as const };
 }
 
 export async function forgotPassword(email: string) {

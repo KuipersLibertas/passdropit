@@ -14,6 +14,7 @@ declare module 'next-auth' {
       paypal_id: string;
       subscription_id: string;
       logo: string;
+      email_verified: boolean;
     }
   }
 }

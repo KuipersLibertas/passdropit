@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import * as yup from 'yup';
 import Container from '@/components/Container';
+import HCaptcha from '@hcaptcha/react-hcaptcha';
 
 import { useFormik } from 'formik';
 import {
@@ -64,6 +65,9 @@ const SignUp = (): JSX.Element => {
   const [isSignUpProcessing, setIsSignUpProcessing] = useState<boolean>(false);
   const [isFbLoginProcessing, setIsFbLoginProcessing] = useState<boolean>(false);
   const [fbReady, setFbReady] = useState<boolean>(false);
+  const [hcaptchaToken, setHcaptchaToken] = useState<string>('');
+  const [registered, setRegistered] = useState<boolean>(false);
+  const hcaptchaRef = useRef<HCaptcha>(null);
 
   useEffect(() => {
     const appId = process.env.NEXT_PUBLIC_FACEBOOK_CLIENT_ID;
@@ -105,27 +109,35 @@ const SignUp = (): JSX.Element => {
       return;
     }
 
+    if (!hcaptchaToken) {
+      toast.error('Please complete the captcha', CustomToastOptions);
+      return;
+    }
+
     setIsSignUpProcessing(true);
     signUp({
       firstName: values.firstName,
       lastName: values.lastName,
       email: values.email,
       password: values.password,
+      hcaptchaToken,
     })
       .then((response) => {
         setIsSignUpProcessing(false);
+        hcaptchaRef.current?.resetCaptcha();
+        setHcaptchaToken('');
 
         if (response.success) {
-          toast.success('Successfully registered', CustomToastOptions);
-          window.location.href = '/signin';
+          setRegistered(true);
         } else {
           const { message } = response;
           toast.error(message, CustomToastOptions);
-        }        
+        }
       })
       .catch(error => {
         setIsSignUpProcessing(false);
-
+        hcaptchaRef.current?.resetCaptcha();
+        setHcaptchaToken('');
         toast.error(error.message, CustomToastOptions);
       });
   };
@@ -174,6 +186,25 @@ const SignUp = (): JSX.Element => {
       });
   };
 
+
+  if (registered) {
+    return (
+      <Container sx={{ maxWidth: '40rem' }}>
+        <Box textAlign="center">
+          <Typography variant="h4" fontWeight={700} gutterBottom>
+            Check your inbox
+          </Typography>
+          <Typography color="text.secondary">
+            We sent a verification link to your email address. Click the link to activate your account.
+          </Typography>
+          <Typography mt={2} color="text.secondary" variant="body2">
+            Didn&apos;t get it? Check your spam folder or{' '}
+            <Link className="link" href="/signin">sign in</Link> to resend.
+          </Typography>
+        </Box>
+      </Container>
+    );
+  }
 
   return (
     <Container sx={{ maxWidth: '40rem' }}>
@@ -259,6 +290,14 @@ const SignUp = (): JSX.Element => {
               error={formik.touched.confirmPassword && Boolean(formik.errors.confirmPassword)}
               // @ts-ignore
               helperText={formik.touched.confirmPassword && formik.errors.confirmPassword}
+            />
+          </Grid>
+          <Grid item xs={12} display="flex" justifyContent="center">
+            <HCaptcha
+              ref={hcaptchaRef}
+              sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY ?? '10000000-ffff-ffff-ffff-000000000001'}
+              onVerify={setHcaptchaToken}
+              onExpire={() => setHcaptchaToken('')}
             />
           </Grid>
           <Grid item container xs={12}>
