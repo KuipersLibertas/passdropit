@@ -8,7 +8,7 @@ API=https://www.filestreams.com/api/v2
 file="${1:?usage: $0 image-file}"
 
 auth=$(curl -sS -m 30 -X POST "$API/authorize" -d "key1=$FILESTREAMS_KEY1" -d "key2=$FILESTREAMS_KEY2")
-tok=$(printf '%s' "$auth" | python3 -I -c 'import sys,json;d=json.load(sys.stdin);print(d["data"]["access_token"]+" "+d["data"]["account_id"])') \
+tok=$(printf '%s' "$auth" | python3 -I -c 'import sys,json;d=json.load(sys.stdin);print(d["data"]["access_token"]+" "+str(d["data"]["account_id"]))') \
   || { echo "authorize failed: $auth" >&2; exit 1; }
 set -- $tok
 
