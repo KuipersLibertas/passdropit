@@ -127,3 +127,45 @@ Free to use. Pro is $5/month.
 passdropit.com
 
 #CreatorEconomy #ContentCreator #YouTubeCreator #LUTpack #AfterEffects
+
+---
+
+# Rolling top-up (Tue 2026-11-03 ~11:15 Amsterdam)
+
+Buffer account now holds only the three Passdropit channels (X, Instagram, Facebook). Notions11 moved to its own account. Each channel is topped up to 3 scheduled posts (9 of 10 slots).
+
+| Date | Platform | Time (Amsterdam) | Buffer ID |
+|------|----------|------------------|-----------|
+| Thu 2026-11-05 | Twitter/X | 09:00 (rescheduled from draft) | 6ae8445c76279ec7eb9ea18a |
+| Thu 2026-11-05 | Facebook | 10:00 | 6ae9b39339637decb082781a |
+| Sat 2026-11-07 | Facebook | 10:00 | 6ae9b394de49dc57f0114561 |
+| Tue 2026-11-10 | Facebook | 10:00 | 6ae9b396b23a0b74f135f390 |
+
+Fri 2026-11-06 14:00 Twitter/X (6ae8445f64604db3144b68f7, After Effects) remains a draft.
+
+### Thu 2026-11-05 · Facebook · 10:00
+Lightroom preset makers: do you know who downloads your free pack?
+
+A plain Dropbox or Google Drive link gives you nothing. No download count. No location. No way to stop a reshare.
+
+Passdropit wraps your existing link. Add a password, see every download in your dashboard, and keep the file with the people you made it for. Free to start.
+
+passdropit.com
+
+### Sat 2026-11-07 · Facebook · 10:00
+Weekend question for creators: how long should a free download link stay alive?
+
+A week? A month? Forever? Most cloud links never expire, so the answer is usually "forever" by accident.
+
+With Passdropit you pick an expiry date or a download limit, and the link closes on its own. It works with Dropbox and Google Drive links, no re-upload needed. Free to use.
+
+passdropit.com
+
+### Tue 2026-11-10 · Facebook · 10:00
+Know the moment someone opens your file.
+
+Turn on email alerts in Passdropit and you get a message each time your protected link is used. You see when it happened and where it came from.
+
+Handy for client deliveries, course materials and any pack you only meant for a few people. Email alerts are part of Pro, $5/month.
+
+passdropit.com
