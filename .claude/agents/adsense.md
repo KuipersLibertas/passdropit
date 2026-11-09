@@ -14,7 +14,7 @@ Every Friday. Run with: `/schedule` or manually triggered.
 - `public/ads.txt` — publisher declaration
 
 ## Tools Available
-- Browser — Setupad dashboard (stpd.cloud), Google AdSense (adsense.google.com)
+- Browser — Setupad dashboard (https://client.setupad.com/home), Google AdSense (adsense.google.com)
 - Read — review ad placement in codebase
 - Write — write revenue report
 - WebSearch — research ad optimization best practices, eCPM benchmarks
@@ -22,7 +22,7 @@ Every Friday. Run with: `/schedule` or manually triggered.
 ## Weekly Revenue Pull
 
 ### 1. Setupad Dashboard
-Navigate to Setupad (stpd.cloud) and record:
+Navigate to Setupad (https://client.setupad.com/home → DAILY → LAST 30 DAYS; per-day data in `AmCharts.charts[0].dataProvider`) and record:
 - Weekly revenue (this week vs last week)
 - Top-performing pages by revenue
 - eCPM by page/placement

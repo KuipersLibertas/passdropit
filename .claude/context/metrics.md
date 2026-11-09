@@ -1,22 +1,30 @@
 # Passdropit — Live Metrics
 
-*Updated weekly by Analytics Agent. Last agent run: 2026-10-26 (W43). GA4 live via Chrome; Stripe/Supabase/Setupad not reachable.*
+*Updated weekly by Analytics Agent. Last agent run: 2026-11-08 (W45 full scheduled run). Full weekly KPI: see reports/kpi-2026-W45.md.*
 
 ## Latest Weekly Snapshot
-*Updated by Analytics Agent — 2026-W43 (2026-10-19 to 2026-10-25). GA4 live; Stripe/Supabase/Setupad unreachable this run (last known values carried).*
+*Updated by Analytics Agent — 2026-W45 (Nov 2–8; GA4 includes partial Sun Nov 8). Compared vs W44 (Oct 26–Nov 1). See reports/kpi-2026-W45.md.*
 
 | Metric | Value | Week |
 |--------|-------|------|
-| Total Users (7d) | 2,069 | 2026-W43 |
-| New Users (7d) | 2,000 | 2026-W43 |
-| Sessions (7d) | 2,303 | 2026-W43 |
-| Page Views (7d) | 4,207 | 2026-W43 |
-| Form starts (7d) | 1,311 | 2026-W43 |
-| Download events (7d) | 42 ⚠️ (GA4 only; still a tracking gap, DB check blocked) | 2026-W43 |
-| Organic Search sessions (7d) | 14 (0.6%) 🔴 | 2026-W43 |
-| Stripe MRR | €16.91 (~$18.60 USD) — last known, Stripe logged out | 2026-W42 |
-| Active subscriptions | 3 — last known | 2026-W42 |
-| Ad revenue (7d) | ~$0.23 (estimate; Setupad not reachable) | 2026-W43 |
+| Total Users (7d) | 1,380 (W44: 2,004, −31% — mostly W44 Boardman bot spike ending) | 2026-W45 |
+| New Users (7d) | 1,302 (W44: 1,939) | 2026-W45 |
+| Sessions (7d) | 1,618 (W44: 2,217, −27%) | 2026-W45 |
+| Page Views (7d) | 3,041 (W44: 3,647); Setupad full-day PV/day only −6% | 2026-W45 |
+| Form starts (7d) | 951 / 539 users (W44: 929) ↑ | 2026-W45 |
+| Download events (7d) | 28 ⚠️ (GA4 only; tracking gap, DB still blocked) | 2026-W45 |
+| Organic Search sessions (7d) | 7 (0.43%) 🔴 — 4th week collapsed | 2026-W45 |
+| Top channel | Organic Video 902 sessions (55.8%); Direct 590 (36.5%, −49% as bots stopped) | 2026-W45 |
+| Organic Video source | youtube.com/referral | 2026-W45 |
+| Top country | Indonesia 345 → US 265 (was 808 bot-inflated) → Philippines 178 | 2026-W45 |
+| Stripe MRR | €16.91 (~$19) contracted; only $9/mo actually collecting (2 HUSTLE subs past due) | 2026-W45 |
+| Active subscriptions | 1 active + 2 past due; 0 new / 0 cancelled | 2026-W45 |
+| Ad revenue (7d) | €0.45 Nov 2–7 (W44 €0.85 incl. €0.30 outlier day); eCPM sliding €0.34 → €0.14 | 2026-W45 |
+| Registered users / DB downloads | unavailable — no Passdropit Supabase credentials on this machine | 2026-W45 |
+
+## Data Source Access
+- **Setupad dashboard:** https://client.setupad.com/home (logged in via Chrome). Reporting → Daily → Last 30 days. Per-day rows can be read from `AmCharts.charts[0].dataProvider`. Currency: EUR. (`dashboard.setupad.io` is dead and returns 404.)
+- **Stripe:** https://dashboard.stripe.com/acct_1M5Q13E4EcK5n9Ja/billing (logged in via Chrome, as of 2026-11-06)
 
 ## Baseline Metrics (Aug–Oct 2026)
 - MAU: ~10,100
