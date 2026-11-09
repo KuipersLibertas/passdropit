@@ -1,9 +1,13 @@
 import React from 'react';
+import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { IServerLinkDetail } from '@/types';
 import { getLinkDetail } from '@/lib/db/links';
 import MainLayout from '@/layouts/Main';
 import DownloadView from '@/views/Download';
+
+// Link-gate pages are user content: keep them out of Google's index.
+export const metadata: Metadata = { robots: { index: false, follow: false } };
 
 // Cache each rendered download page for 5 minutes on Vercel's CDN.
 // The password-validation and file-access calls are still server-side API

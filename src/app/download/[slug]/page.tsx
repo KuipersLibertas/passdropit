@@ -1,4 +1,5 @@
 import React from 'react';
+import { Metadata } from 'next';
 
 export const revalidate = 300;
 
@@ -7,6 +8,9 @@ import { redirect } from 'next/navigation';
 import { IServerLinkDetail } from '@/types';
 import { getLinkDetail } from '@/lib/db/links';
 import MainLayout from '@/layouts/Main';
+
+// Link-gate pages are user content: keep them out of Google's index.
+export const metadata: Metadata = { robots: { index: false, follow: false } };
 
 const ValidationCheck = async ({ params }: { params: { slug: string } }): Promise<JSX.Element> => {
   let linkInfo: IServerLinkDetail|null = null;
