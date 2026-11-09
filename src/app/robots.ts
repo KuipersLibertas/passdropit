@@ -17,7 +17,8 @@ export default function robots(): MetadataRoute.Robots {
         '/prosignup',
         '/reset-password/',
         '/invalid-link',
-        '/download/',
+        // '/download/' is left crawlable on purpose so Google can see the noindex on
+        // already-indexed link pages. Re-add once GSC shows them dropped.
         '/404',
       ],
     },
