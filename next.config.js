@@ -25,8 +25,28 @@ const securityHeaders = [
   },
 ];
 
+// Retired Notion posts from the old Ghost blog that Google still ranks around
+// position 10. Temporary (307) to the home page, which covers Notion link
+// protection, until a dedicated Notion post exists. Then point them at it with
+// `permanent: true`. Other retired off-topic posts (screenshots, watermarking)
+// are left to 404 via src/app/blog/[id]/page.tsx.
+const retiredNotionPosts = [
+  'manage-your-notion-links',
+  'how-to-share-a-notion-link',
+  'sharing-content-with-your-audience-a-guide-to-using-notion',
+  'how-to-secure-your-notion-content-tips-and-tricks',
+  'unlock-the-power-of-notion-content-sharing',
+];
+
 const nextConfig = {
   reactStrictMode: true,
+  async redirects() {
+    return retiredNotionPosts.map((slug) => ({
+      source: `/blog/${slug}`,
+      destination: '/',
+      permanent: false,
+    }));
+  },
   async headers() {
     return [
       {
