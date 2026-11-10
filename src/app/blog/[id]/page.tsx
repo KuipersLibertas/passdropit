@@ -1,7 +1,7 @@
 import React from 'react';
 import MainLayout from '@/layouts/Main';
 import { default as BlogDetailView } from '@/views/Blog/Detail';
-import { redirect } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { IPost } from '@/types';
 import { Metadata } from 'next';
 import posts from '@/lib/blog/posts';
@@ -12,15 +12,19 @@ function getPost(id: string): IPost | null {
   return posts.find((p) => p.slug === id) ?? null;
 }
 
+// Only the slugs in posts.ts exist; anything else is a real 404, not a soft 404.
+export const dynamicParams = false;
+
 export function generateStaticParams() {
   return posts.map((p) => ({ id: p.slug }));
 }
 
 export function generateMetadata({ params }: { params: { id: string } }): Metadata {
   const post = getPost(params.id);
-  const title = post?.title ? `${post.title}` : 'Blog';
-  const description = post?.custom_excerpt ?? '';
-  const canonical = `${SITE_URL}/blog/${post?.slug ?? params.id}`;
+  if (!post) notFound();
+  const title = post.meta_title || post.title;
+  const description = post.meta_description || post.custom_excerpt || '';
+  const canonical = `${SITE_URL}/blog/${post.slug}`;
 
   return {
     title,
@@ -46,7 +50,8 @@ export function generateMetadata({ params }: { params: { id: string } }): Metada
 const BlogDetail = ({ params }: { params: { id: string } }): JSX.Element => {
   if (!params.id) redirect('/');
   const post = getPost(params.id);
-  const canonical = `${SITE_URL}/blog/${post?.slug ?? params.id}`;
+  if (!post) notFound();
+  const canonical = `${SITE_URL}/blog/${post.slug}`;
 
   const articleSchema = post ? {
     '@context': 'https://schema.org',
