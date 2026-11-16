@@ -134,7 +134,6 @@ export async function POST(
     'user-analytics',
     'buy-link',
     'upload-logo',
-    'save-link',
     'delete-logo',
   ];
 
@@ -220,7 +219,7 @@ export async function POST(
 
       // ── Links ──────────────────────────────────────────────────────────────
       case 'save-link': {
-        if (!session?.user?.email_verified) {
+        if (session && !session?.user?.email_verified) {
           return NextResponse.json({ success: false, message: 'Please verify your email address before creating links. Check your inbox for a verification email.' }, { status: 403 });
         }
         const result = await linksDb.saveLink(userId, req as any);
